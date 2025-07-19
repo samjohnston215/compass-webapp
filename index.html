@@ -26,16 +26,18 @@
 
   <div id="compass">
     <svg id="compass-svg" viewBox="0 0 64 64" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <!-- Compass base -->
-      <rect x="2" y="2" width="60" height="60" fill="#7a7a7a" stroke="#000" stroke-width="4" rx="8" ry="8"/>
-      <!-- Compass face -->
-      <line x1="32" y1="8" x2="32" y2="56" stroke="#000" stroke-width="2"/>
-      <line x1="8" y1="32" x2="56" y2="32" stroke="#000" stroke-width="2"/>
-      <!-- Needle -->
+      <!-- Outer ring -->
+      <circle cx="32" cy="32" r="30" fill="#5e5e5e" stroke="#1a1a1a" stroke-width="4"/>
+    
+      <!-- Inner face -->
+      <circle cx="32" cy="32" r="24" fill="#aaa" stroke="#666" stroke-width="2"/>
+    
+      <!-- Needle group -->
       <g id="needle" transform="rotate(0, 32, 32)">
-        <rect x="30" y="12" width="4" height="20" fill="#d22" />
-        <polygon points="32,6 26,18 38,18" fill="#d22" />
-        <polygon points="32,32 26,44 38,44" fill="#444" />
+        <!-- Red needle (points to target) -->
+        <polygon points="32,8 28,32 36,32" fill="#d22" />
+        <!-- Tail needle (points opposite) -->
+        <polygon points="32,56 28,32 36,32" fill="#333" />
       </g>
     </svg>
   </div>
