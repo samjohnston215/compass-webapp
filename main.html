@@ -1,99 +1,63 @@
+<!-- main.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Love Compass</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --serenity-green: #9ACD32; /* light forest green */
+      --serenity-green: #9ACD32;
       --athloi-lavender: #B57EDC;
     }
     body {
       font-family: 'Press Start 2P', monospace;
-      background-color: #1d1d1d; /* default fallback */
-      color: white;
+      margin: 0;
+      padding: 1rem;
       text-align: center;
-      padding: 2rem 1rem;
-      transition: background-color 0.5s ease;
+      color: white;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-    }
-    body.serenitym16 {
       background-color: var(--serenity-green);
-      color: #1a1a1a;
-    }
-    body.athloi {
-      background-color: var(--athloi-lavender);
-      color: #2f1f4a;
-    }
-    #id-display {
-      margin-bottom: 1.5rem;
-    }
-    #id-display p {
-      margin: 0.5rem 0;
-      font-size: 1.1rem;
-    }
-    #compass {
-      width: 80vw;
-      max-width: 320px;
-      height: auto;
-      margin: 0 auto;
-    }
-    #compass-img {
-      width: 100%;
-      height: auto;
-      image-rendering: pixelated;
-      display: block;
-      margin: 0 auto;
-    }
-    .btn-swap {
-      margin-top: 1.5rem;
-      background-color: rgba(0,0,0,0.3);
-      color: inherit;
-      border: 2px solid currentColor;
-      padding: 10px;
-      font-family: 'Press Start 2P', monospace;
-      cursor: pointer;
-      border-radius: 6px;
-      transition: background-color 0.3s ease;
-    }
-    .btn-swap:hover {
-      background-color: rgba(0,0,0,0.5);
     }
 
-    /* Smaller screens tweak */
-    @media (max-width: 360px) {
-      body {
-        padding: 1rem 0.5rem;
-      }
-      #id-display p {
-        font-size: 1rem;
-      }
-      .btn-swap {
-        padding: 8px;
-        font-size: 0.9rem;
+    .info-panel {
+      max-width: 400px;
+      margin: auto;
+      padding: 1rem;
+      background: rgba(0,0,0,0.6);
+      border: 3px solid white;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    #compass-img {
+      max-width: 90vmin;
+      height: auto;
+      image-rendering: pixelated;
+      margin: 20px auto;
+    }
+
+    @media (max-width: 500px) {
+      #compass-img {
+        max-width: 95vmin;
       }
     }
   </style>
 </head>
 <body>
-  <h1>Love Compass</h1>
-  <div id="id-display">
-    <p><strong>Your ID:</strong> <span id="your-id-text"></span></p>
-    <p><strong>Lover's ID:</strong> <span id="lover-id-text"></span></p>
+  <div class="info-panel">
+    <div><strong>Your ID:</strong> <span id="yourName"></span></div>
+    <div><strong>Lover’s ID:</strong> <span id="loverName"></span></div>
   </div>
-  <button class="btn-swap" onclick="swapIDs()">Swap IDs</button>
-  <div id="compass">
-    <img id="compass-img" src="" alt="Compass" />
-  </div>
+
+  <img id="compass-img" src="" alt="Compass Frame" />
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
@@ -105,108 +69,108 @@
       appId: "1:820890755353:web:d4e33e791f925166506588"
     };
     firebase.initializeApp(firebaseConfig);
+
     const db = firebase.database();
+    const auth = firebase.auth();
 
-    let yourID = localStorage.getItem('yourID');
-    let loverID = localStorage.getItem('loverID');
+    const yourID = localStorage.getItem('yourID');
+    const loverID = localStorage.getItem('loverID');
+    const theme = localStorage.getItem('themeColor');
 
-    if (!yourID || !loverID) {
-      alert('IDs not found. Please select your IDs.');
-      window.location.href = 'index.html';
+    const emailMap = {
+      "Serenitym16": "serenitym16@example.com",
+      "athloi": "athloi@example.com"
+    };
+    const passwordMap = {
+      "Serenitym16": "password123",
+      "athloi": "password123"
+    };
+
+    document.getElementById('yourName').textContent = yourID;
+    document.getElementById('loverName').textContent = loverID;
+
+    // Background color
+    if (theme === 'serenity') {
+      document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
+    } else {
+      document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--athloi-lavender');
     }
 
-    // Apply background color class based on yourID
-    const bodyEl = document.body;
-    if (yourID.toLowerCase() === 'serenitym16') {
-      bodyEl.classList.add('serenitym16');
-    } else if (yourID.toLowerCase() === 'athloi') {
-      bodyEl.classList.add('athloi');
+    function toRad(d) {
+      return d * Math.PI / 180;
     }
 
-    document.getElementById('your-id-text').textContent = yourID;
-    document.getElementById('lover-id-text').textContent = loverID;
-
-    function swapIDs() {
-      [yourID, loverID] = [loverID, yourID];
-      localStorage.setItem('yourID', yourID);
-      localStorage.setItem('loverID', loverID);
-      document.getElementById('your-id-text').textContent = yourID;
-      document.getElementById('lover-id-text').textContent = loverID;
-
-      // Update background color after swap
-      bodyEl.classList.remove('serenitym16', 'athloi');
-      if (yourID.toLowerCase() === 'serenitym16') {
-        bodyEl.classList.add('serenitym16');
-      } else if (yourID.toLowerCase() === 'athloi') {
-        bodyEl.classList.add('athloi');
-      }
+    function getBearing(lat1, lon1, lat2, lon2) {
+      const dLon = toRad(lon2 - lon1);
+      const y = Math.sin(dLon) * Math.cos(toRad(lat2));
+      const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
+                Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
+      const brg = Math.atan2(y, x) * 180 / Math.PI;
+      return (brg + 360) % 360;
     }
 
-    function toRadians(deg) {
-      return (deg * Math.PI) / 180;
+    function showNeedle(angle) {
+      const totalFrames = 29;
+      const frameIdx = Math.floor((angle / 360) * totalFrames) % totalFrames;
+      const padded = frameIdx.toString().padStart(2, '0');
+      const imgURL = `images/needle-frames/frame_${padded}_delay-0.06s.png`;
+      document.getElementById('compass-img').src = imgURL;
     }
 
-    function calculateBearing(lat1, lon1, lat2, lon2) {
-      const dLon = toRadians(lon2 - lon1);
-      const y = Math.sin(dLon) * Math.cos(toRadians(lat2));
-      const x =
-        Math.cos(toRadians(lat1)) * Math.sin(toRadians(lat2)) -
-        Math.sin(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.cos(dLon);
-      let brng = Math.atan2(y, x);
-      brng = (brng * 180) / Math.PI;
-      return (brng + 360) % 360;
-    }
-
-    const baseURL = 'https://raw.githubusercontent.com/samjohnston215/compass-webapp/main/images/needle-frames/';
-    const totalFrames = 29;
-
-    function getFrameURL(index) {
-      const paddedIndex = index.toString().padStart(2, '0');
-      return `${baseURL}frame_${paddedIndex}_delay-0.06s.png`;
-    }
-
-    const compassImg = document.getElementById('compass-img');
-
-    let yourCoords = { lat: 0, lon: 0 };
-    let loverCoords = { lat: 0, lon: 0 };
+    let yourPos = {}, loverPos = {};
 
     function updateCompass() {
-      const bearing = calculateBearing(
-        yourCoords.lat,
-        yourCoords.lon,
-        loverCoords.lat,
-        loverCoords.lon
-      );
-
-      // Your frame 00 points south (180°), so offset bearing by 180°
-      let frameIndex = Math.round(((bearing + 180) % 360) / (360 / totalFrames));
-      frameIndex = frameIndex % totalFrames;
-
-      compassImg.src = getFrameURL(frameIndex);
+      if (yourPos.lat && loverPos.lat) {
+        const brg = getBearing(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon);
+        showNeedle(brg);
+      }
     }
 
-    navigator.geolocation.watchPosition(
-      (pos) => {
-        yourCoords.lat = pos.coords.latitude;
-        yourCoords.lon = pos.coords.longitude;
-        db.ref('users/' + yourID).set(yourCoords);
-      },
-      () => alert('Error getting location. Please enable GPS and reload.'),
-      {
-        enableHighAccuracy: true,
-        maximumAge: 10000,
-        timeout: 5000,
-      }
-    );
+    function startTracking() {
+      navigator.geolocation.watchPosition(pos => {
+        yourPos = {
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude
+        };
+        db.ref('users/' + yourID).set(yourPos);
+      }, () => alert('Location permission denied'), {
+        enableHighAccuracy: true
+      });
 
-    db.ref('users/' + loverID).on('value', (snapshot) => {
-      const data = snapshot.val();
-      if (data && data.lat != null && data.lon != null) {
-        loverCoords.lat = data.lat;
-        loverCoords.lon = data.lon;
-        updateCompass();
+      db.ref('users/' + loverID).on('value', snapshot => {
+        const data = snapshot.val();
+        if (data && data.lat && data.lon) {
+          loverPos = { lat: data.lat, lon: data.lon };
+          updateCompass();
+        }
+      });
+    }
+
+    // Check if already logged in
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        startTracking();
+      } else {
+        // Not signed in: log in with mapped credentials
+        const email = emailMap[yourID];
+        const password = passwordMap[yourID];
+
+        if (!email || !password) {
+          alert("Login config not found. Check index.html setup.");
+          return;
+        }
+
+        auth.signInWithEmailAndPassword(email, password)
+          .then(() => startTracking())
+          .catch(err => alert("Auth failed: " + err.message));
       }
     });
+
+    // Redirect if no ID info
+    if (!yourID || !loverID) {
+      alert("Missing ID info. Returning to start.");
+      window.location.href = 'index.html';
+    }
   </script>
 </body>
 </html>
