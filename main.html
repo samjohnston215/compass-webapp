@@ -168,22 +168,33 @@
           updateCompass();
           statusMsg.textContent = '';  // Clear status message on valid data
           lastLoverUpdate = Date.now();
+          console.log(`Received lover location at ${new Date(lastLoverUpdate).toLocaleTimeString()}`);
         } else {
           loverPos = null;
           updateCompass();
           statusMsg.textContent = `Waiting for ${loverID}'s location...`;
+          console.log(`No lover location data available.`);
         }
       });
-
+      
       // Periodic check for stale data
       setInterval(() => {
-        if (!lastLoverUpdate || (Date.now() - lastLoverUpdate > 30000)) {
-          statusMsg.textContent = `${loverID}'s location is unavailable or outdated.`;
-          loverPos = null;
-          updateCompass();
+        const now = Date.now();
+        if (!lastLoverUpdate || (now - lastLoverUpdate > 30000)) {
+          if (statusMsg.textContent !== `${loverID}'s location is unavailable or outdated.`) {
+            statusMsg.textContent = `${loverID}'s location is unavailable or outdated.`;
+            loverPos = null;
+            updateCompass();
+            console.log(`Lover location stale or missing as of ${new Date(now).toLocaleTimeString()}`);
+          }
+        } else {
+          // Optionally clear stale message if data is fresh
+          if (statusMsg.textContent !== '') {
+            statusMsg.textContent = '';
+            console.log('Lover location is fresh, cleared status message.');
+          }
         }
       }, 5000);
-    }
 
     // Firebase Authentication and Start Tracking
     auth.onAuthStateChanged(user => {
