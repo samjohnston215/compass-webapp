@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Love Compass</title>
+
+  <!-- External Minecraft-style font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* Global / Pixel-grass background */
+    body {
+      margin: 0;
+      padding: 1rem;
+      font-family: 'Press Start 2P', monospace;
+      background-color: #789262;
+      background-image:
+        linear-gradient(0deg, transparent 24%, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.06) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.06) 75%, rgba(0,0,0,0.06) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.06) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.06) 75%, rgba(0,0,0,0.06) 76%, transparent 77%, transparent);
+      background-size: 32px 32px;
+      color: #eee;
+      text-align: center;
+    }
+
+    h1, p {
+      margin: 0.3rem 0;
+    }
+
+    #info-panel {
+      background: rgba(0,0,0,0.6);
+      border: 4px solid #444;
+      border-radius: 4px;
+      padding: 1rem;
+      max-width: 360px;
+      margin: 1rem auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    #info-panel div {
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-size: 0.7rem;
+      margin-bottom: 0.3rem;
+    }
+
+    select {
+      width: 100%;
+      padding: 0.6rem;
+      font-size: 1rem;
+      background: #222;
+      color: #eee;
+      border: 2px solid #555;
+      border-radius: 4px;
+      appearance: none;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #ff4444;
+    }
+
+    #compass {
+      width: 260px;
+      height: 260px;
+      margin: 1rem auto;
+    }
+
+    /* Enforce pixel-art rendering */
+    svg {
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
+      shape-rendering: crispEdges;
+    }
+
+    /* Needle twitch */
+    @keyframes twitch {
+      0%   { transform: rotate(0deg); }
+      25%  { transform: rotate(-2deg); }
+      50%  { transform: rotate(2deg); }
+      75%  { transform: rotate(-1deg); }
+      100% { transform: rotate(0deg); }
+    }
+    #needle.twitch {
+      animation: twitch 0.3s ease-in-out;
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 500px) {
+      body { padding: 0.5rem; }
+      #compass { width: 200px; height: 200px; }
+      select { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="info-panel">
+    <div><h1>Love Compass</h1></div>
+    <div>
+      <label>Your Name</label>
+      <div id="yourNameDisplay"></div>
+    </div>
+    <div>
+      <label for="friendID">Friend’s Name</label>
+      <select id="friendID">
+        <option value="Athloi">Athloi</option>
+        <option value="Serenitym16">Serenitym16</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="compass">
+    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer ring (pixel style) -->
+      <rect x="2" y="2" width="60" height="60" fill="#777" stroke="#333" stroke-width="4" />
+      <!-- Inner face -->
+      <rect x="6" y="6" width="52" height="52" fill="#ccc" stroke="#555" stroke-width="2" />
+      <!-- Tick marks -->
+      <g fill="#333">
+        <rect x="31" y="8" width="2" height="8"/>
+        <rect x="31" y="48" width="2" height="8"/>
+        <rect x="8" y="31" width="8" height="2"/>
+        <rect x="48" y="31" width="8" height="2"/>
+      </g>
+      <!-- Pixel-art needle -->
+      <g id="needle" transform="rotate(0,32,32)">
+        <polygon points="32,10 28,32 36,32" fill="#ff4444"/>
+        <polygon points="32,54 28,32 36,32" fill="#222"/>
+        <rect x="30" y="30" width="4" height="4" fill="#444"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <script>
+    // Redirect back if no name chosen
+    const yourID = localStorage.getItem('yourID');
+    if (!yourID) {
+      window.location.href = 'index.html';
+    }
+    document.getElementById('yourNameDisplay').textContent = yourID;
+
+    // Firebase init
+    const firebaseConfig = {
+      apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
+      authDomain: "compassapp-cb4ed.firebaseapp.com",
+      databaseURL: "https://compassapp-cb4ed-default-rtdb.firebaseio.com",
+      projectId: "compassapp-cb4ed",
+      storageBucket: "compassapp-cb4ed.appspot.com",
+      messagingSenderId: "820890755353",
+      appId: "1:820890755353:web:d4e33e791f925166506588"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Helpers
+    function toRad(d){return d*Math.PI/180;}
+    function calcBearing(la1,lo1,la2,lo2){
+      const dLon = toRad(lo2 - lo1);
+      const y = Math.sin(dLon)*Math.cos(toRad(la2));
+      const x = Math.cos(toRad(la1))*Math.sin(toRad(la2))
+              - Math.sin(toRad(la1))*Math.cos(toRad(la2))*Math.cos(dLon);
+      let b = Math.atan2(y,x)*180/Math.PI;
+      return (b + 360) % 360;
+    }
+
+    const needle = document.getElementById('needle');
+    let yourCoords = {}, friendCoords = {};
+
+    function updateCompass() {
+      const brg = calcBearing(
+        yourCoords.lat, yourCoords.lon,
+        friendCoords.lat, friendCoords.lon
+      );
+      // twitch
+      needle.classList.remove('twitch');
+      void needle.offsetWidth;
+      needle.classList.add('twitch');
+      // rotate after twitch
+      setTimeout(() => {
+        needle.setAttribute('transform', `rotate(${brg},32,32)`);
+      }, 300);
+    }
+
+    function startTracking() {
+      const friendID = document.getElementById('friendID').value;
+
+      // your geolocation
+      navigator.geolocation.watchPosition(pos => {
+        yourCoords = {
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude
+        };
+        db.ref('users/' + yourID).set(yourCoords);
+      }, err => {
+        alert('Enable GPS to use the Love Compass');
+      }, {
+        enableHighAccuracy: true,
+        maximumAge: 10000,
+        timeout: 5000
+      });
+
+      // friend’s location from Firebase
+      db.ref('users/' + friendID).on('value', snap => {
+        const d = snap.val();
+        if (d && d.lat && d.lon) {
+          friendCoords = { lat: d.lat, lon: d.lon };
+          updateCompass();
+        }
+      });
+    }
+
+    // whenever they pick a friend, (re)start tracking
+    document.getElementById('friendID')
+      .addEventListener('change', startTracking);
+
+    // initial kickoff
+    startTracking();
+  </script>
+</body>
+</html>
