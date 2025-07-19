@@ -6,12 +6,29 @@
   <title>Love Compass</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --serenity-green: #9ACD32; /* light forest green */
+      --athloi-lavender: #B57EDC;
+    }
     body {
       font-family: 'Press Start 2P', monospace;
-      background-color: #1d1d1d;
+      background-color: #1d1d1d; /* default fallback */
       color: white;
       text-align: center;
       padding: 2rem 1rem;
+      transition: background-color 0.5s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    body.serenitym16 {
+      background-color: var(--serenity-green);
+      color: #1a1a1a;
+    }
+    body.athloi {
+      background-color: var(--athloi-lavender);
+      color: #2f1f4a;
     }
     #id-display {
       margin-bottom: 1.5rem;
@@ -21,29 +38,45 @@
       font-size: 1.1rem;
     }
     #compass {
-      width: 128px;
-      height: 128px;
+      width: 80vw;
+      max-width: 320px;
+      height: auto;
       margin: 0 auto;
     }
     #compass-img {
-      width: 128px;
-      height: 128px;
+      width: 100%;
+      height: auto;
       image-rendering: pixelated;
       display: block;
       margin: 0 auto;
     }
     .btn-swap {
       margin-top: 1.5rem;
-      background-color: #444;
-      color: white;
-      border: 2px solid white;
+      background-color: rgba(0,0,0,0.3);
+      color: inherit;
+      border: 2px solid currentColor;
       padding: 10px;
       font-family: 'Press Start 2P', monospace;
       cursor: pointer;
       border-radius: 6px;
+      transition: background-color 0.3s ease;
     }
     .btn-swap:hover {
-      background-color: #666;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    /* Smaller screens tweak */
+    @media (max-width: 360px) {
+      body {
+        padding: 1rem 0.5rem;
+      }
+      #id-display p {
+        font-size: 1rem;
+      }
+      .btn-swap {
+        padding: 8px;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
@@ -82,6 +115,14 @@
       window.location.href = 'index.html';
     }
 
+    // Apply background color class based on yourID
+    const bodyEl = document.body;
+    if (yourID.toLowerCase() === 'serenitym16') {
+      bodyEl.classList.add('serenitym16');
+    } else if (yourID.toLowerCase() === 'athloi') {
+      bodyEl.classList.add('athloi');
+    }
+
     document.getElementById('your-id-text').textContent = yourID;
     document.getElementById('lover-id-text').textContent = loverID;
 
@@ -91,6 +132,14 @@
       localStorage.setItem('loverID', loverID);
       document.getElementById('your-id-text').textContent = yourID;
       document.getElementById('lover-id-text').textContent = loverID;
+
+      // Update background color after swap
+      bodyEl.classList.remove('serenitym16', 'athloi');
+      if (yourID.toLowerCase() === 'serenitym16') {
+        bodyEl.classList.add('serenitym16');
+      } else if (yourID.toLowerCase() === 'athloi') {
+        bodyEl.classList.add('athloi');
+      }
     }
 
     function toRadians(deg) {
