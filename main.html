@@ -21,25 +21,16 @@
       font-size: 1.1rem;
     }
     #compass {
-      position: relative;
       width: 128px;
       height: 128px;
       margin: 0 auto;
     }
-    #compass-base {
+    #compass-img {
       width: 128px;
       height: 128px;
       image-rendering: pixelated;
       display: block;
-    }
-    #needle {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 128px;
-      height: 128px;
-      image-rendering: pixelated;
-      pointer-events: none;
+      margin: 0 auto;
     }
     .btn-swap {
       margin-top: 1.5rem;
@@ -64,23 +55,13 @@
   </div>
   <button class="btn-swap" onclick="swapIDs()">Swap IDs</button>
   <div id="compass">
-    <img
-      id="compass-base"
-      src="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/images/compass-base.png"
-      alt="Compass base"
-    />
-    <img
-      id="needle"
-      src=""
-      alt="Compass needle"
-    />
+    <img id="compass-img" src="" alt="Compass" />
   </div>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script>
-    // Replace with your Firebase config (same as before)
     const firebaseConfig = {
       apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
       authDomain: "compassapp-cb4ed.firebaseapp.com",
@@ -93,7 +74,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Get stored IDs or redirect if missing
     let yourID = localStorage.getItem('yourID');
     let loverID = localStorage.getItem('loverID');
 
@@ -111,10 +91,8 @@
       localStorage.setItem('loverID', loverID);
       document.getElementById('your-id-text').textContent = yourID;
       document.getElementById('lover-id-text').textContent = loverID;
-      // Optionally reload location data or compass update here if needed
     }
 
-    // Bearing calculation helper
     function toRadians(deg) {
       return (deg * Math.PI) / 180;
     }
@@ -130,8 +108,7 @@
       return (brng + 360) % 360;
     }
 
-    // Needle frames info
-    const baseURL = 'https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/images/needle-frames/';
+    const baseURL = 'https://raw.githubusercontent.com/samjohnston215/compass-webapp/main/images/needle-frames/';
     const totalFrames = 29;
 
     function getFrameURL(index) {
@@ -139,14 +116,8 @@
       return `${baseURL}frame_${paddedIndex}_delay-0.06s.png`;
     }
 
-    // Preload needle frames
-    const needleFrames = [];
-    for (let i = 0; i < totalFrames; i++) {
-      needleFrames[i] = new Image();
-      needleFrames[i].src = getFrameURL(i);
-    }
+    const compassImg = document.getElementById('compass-img');
 
-    const needleEl = document.getElementById('needle');
     let yourCoords = { lat: 0, lon: 0 };
     let loverCoords = { lat: 0, lon: 0 };
 
@@ -158,23 +129,20 @@
         loverCoords.lon
       );
 
-      // Since frame_00 points south (180°), offset by 180°
+      // Your frame 00 points south (180°), so offset bearing by 180°
       let frameIndex = Math.round(((bearing + 180) % 360) / (360 / totalFrames));
       frameIndex = frameIndex % totalFrames;
 
-      needleEl.src = getFrameURL(frameIndex);
+      compassImg.src = getFrameURL(frameIndex);
     }
 
-    // Watch your location and update Firebase
     navigator.geolocation.watchPosition(
       (pos) => {
         yourCoords.lat = pos.coords.latitude;
         yourCoords.lon = pos.coords.longitude;
         db.ref('users/' + yourID).set(yourCoords);
       },
-      (err) => {
-        alert('Error getting location. Please enable GPS and reload.');
-      },
+      () => alert('Error getting location. Please enable GPS and reload.'),
       {
         enableHighAccuracy: true,
         maximumAge: 10000,
@@ -182,7 +150,6 @@
       }
     );
 
-    // Listen for lover's location updates
     db.ref('users/' + loverID).on('value', (snapshot) => {
       const data = snapshot.val();
       if (data && data.lat != null && data.lon != null) {
