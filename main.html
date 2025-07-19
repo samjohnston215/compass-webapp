@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --serenity-green: #9ACD32;
+      --serenity-green: #89a32e; /* Slightly darker green */
       --athloi-lavender: #B57EDC;
     }
     body {
@@ -19,6 +19,7 @@
       color: white;
       min-height: 100vh;
       background-color: var(--serenity-green);
+      transition: background-color 0.5s ease;
     }
 
     .info-panel {
@@ -36,6 +37,14 @@
       height: auto;
       image-rendering: pixelated;
       margin: 20px auto;
+      display: none; /* Hidden initially, shown when location ready */
+    }
+
+    #status-message {
+      color: yellow;
+      font-family: 'Press Start 2P', monospace;
+      margin-top: 1rem;
+      min-height: 1.4em;
     }
 
     @media (max-width: 500px) {
@@ -52,6 +61,7 @@
   </div>
 
   <img id="compass-img" src="" alt="Compass Frame" />
+  <div id="status-message"></div>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -75,7 +85,6 @@
 
     const yourID = localStorage.getItem('yourID');
     const loverID = localStorage.getItem('loverID');
-    const theme = localStorage.getItem('themeColor');
 
     const emailMap = {
       "Serenitym16": "serenitym16@example.com",
@@ -89,26 +98,21 @@
     document.getElementById('yourName').textContent = yourID;
     document.getElementById('loverName').textContent = loverID;
 
-    // Function to update background color dynamically
+    // Update background color based on yourID
     function updateBackgroundColor(id) {
       if (id.toLowerCase() === 'serenitym16') {
         document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
       } else if (id.toLowerCase() === 'athloi') {
         document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--athloi-lavender');
       } else {
-        // default fallback
         document.body.style.backgroundColor = '#1d1d1d';
       }
     }
-    
-    // Set initial background color
     updateBackgroundColor(yourID);
-
 
     function toRad(d) {
       return d * Math.PI / 180;
     }
-
     function getBearing(lat1, lon1, lat2, lon2) {
       const dLon = toRad(lon2 - lon1);
       const y = Math.sin(dLon) * Math.cos(toRad(lat2));
@@ -118,20 +122,31 @@
       return (brg + 360) % 360;
     }
 
+    const statusMsg = document.getElementById('status-message');
+    const compassImg = document.getElementById('compass-img');
+    const totalFrames = 29;
+
+    let yourPos = {}, loverPos = null;
+    let lastLoverUpdate = 0;
+
     function showNeedle(angle) {
-      const totalFrames = 29;
+      if (angle == null || loverPos === null) {
+        compassImg.style.display = 'none';
+        return;
+      }
+      compassImg.style.display = 'block';
       const frameIdx = Math.floor((angle / 360) * totalFrames) % totalFrames;
       const padded = frameIdx.toString().padStart(2, '0');
       const imgURL = `images/needle-frames/frame_${padded}_delay-0.06s.png`;
-      document.getElementById('compass-img').src = imgURL;
+      compassImg.src = imgURL;
     }
 
-    let yourPos = {}, loverPos = {};
-
     function updateCompass() {
-      if (yourPos.lat && loverPos.lat) {
+      if (yourPos.lat && loverPos && loverPos.lat) {
         const brg = getBearing(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon);
         showNeedle(brg);
+      } else {
+        showNeedle(null);
       }
     }
 
@@ -148,19 +163,33 @@
 
       db.ref('users/' + loverID).on('value', snapshot => {
         const data = snapshot.val();
-        if (data && data.lat && data.lon) {
+        if (data && data.lat != null && data.lon != null) {
           loverPos = { lat: data.lat, lon: data.lon };
           updateCompass();
+          statusMsg.textContent = '';  // Clear status message on valid data
+          lastLoverUpdate = Date.now();
+        } else {
+          loverPos = null;
+          updateCompass();
+          statusMsg.textContent = `Waiting for ${loverID}'s location...`;
         }
       });
+
+      // Periodic check for stale data
+      setInterval(() => {
+        if (!lastLoverUpdate || (Date.now() - lastLoverUpdate > 30000)) {
+          statusMsg.textContent = `${loverID}'s location is unavailable or outdated.`;
+          loverPos = null;
+          updateCompass();
+        }
+      }, 5000);
     }
 
-    // Check if already logged in
+    // Firebase Authentication and Start Tracking
     auth.onAuthStateChanged(user => {
       if (user) {
         startTracking();
       } else {
-        // Not signed in: log in with mapped credentials
         const email = emailMap[yourID];
         const password = passwordMap[yourID];
 
@@ -175,7 +204,7 @@
       }
     });
 
-    // Redirect if no ID info
+    // Redirect if missing info
     if (!yourID || !loverID) {
       alert("Missing ID info. Returning to start.");
       window.location.href = 'index.html';
