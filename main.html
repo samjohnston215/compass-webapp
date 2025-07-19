@@ -7,111 +7,80 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
     body {
-      margin: 0;
-      padding: 1rem;
       font-family: 'Press Start 2P', monospace;
-      background-color: #789262;
-      background-image:
-        linear-gradient(0deg, transparent 24%, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.06) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.06) 75%, rgba(0,0,0,0.06) 76%, transparent 77%, transparent),
-        linear-gradient(90deg, transparent 24%, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.06) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.06) 75%, rgba(0,0,0,0.06) 76%, transparent 77%, transparent);
-      background-size: 32px 32px;
-      color: #eee;
+      background-color: #1d1d1d;
+      color: white;
       text-align: center;
+      padding: 2rem 1rem;
     }
-    #info-panel {
-      background: rgba(0, 0, 0, 0.6);
-      border: 4px solid #444;
-      border-radius: 4px;
-      padding: 1rem;
-      max-width: 360px;
-      margin: 1rem auto;
-      box-shadow: 0 0 8px #000;
+    #id-display {
+      margin-bottom: 1.5rem;
     }
-    #info-panel div {
-      text-align: left;
-      margin-bottom: 0.75rem;
-    }
-    #info-panel h1 {
-      margin: 0 0 0.5rem;
-    }
-    #info-panel label {
-      font-size: 0.7rem;
-      margin-bottom: 0.2rem;
-      display: block;
+    #id-display p {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
     }
     #compass {
+      position: relative;
       width: 128px;
       height: 128px;
-      margin: 1rem auto 2rem;
+      margin: 0 auto;
     }
-    svg {
+    #compass-base {
       width: 128px;
       height: 128px;
       image-rendering: pixelated;
-      image-rendering: crisp-edges;
-      shape-rendering: crispEdges;
+      display: block;
     }
-    button {
-      font-family: 'Press Start 2P', monospace;
-      background-color: #ff4444;
+    #needle {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 128px;
+      height: 128px;
+      image-rendering: pixelated;
+      pointer-events: none;
+    }
+    .btn-swap {
+      margin-top: 1.5rem;
+      background-color: #444;
       color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 10px 16px;
+      border: 2px solid white;
+      padding: 10px;
+      font-family: 'Press Start 2P', monospace;
       cursor: pointer;
-      font-size: 0.9rem;
-      box-shadow: 0 0 8px #b03030;
-      transition: background-color 0.3s ease;
+      border-radius: 6px;
     }
-    button:hover {
-      background-color: #e03b3b;
+    .btn-swap:hover {
+      background-color: #666;
     }
   </style>
 </head>
 <body>
-  <div id="info-panel">
-    <h1>Love Compass</h1>
-    <div>
-      <label>Your ID:</label>
-      <div id="yourID-display"></div>
-    </div>
-    <div>
-      <label>Lover's ID:</label>
-      <div id="loverID-display"></div>
-    </div>
-    <button id="swapBtn">Swap IDs</button>
+  <h1>Love Compass</h1>
+  <div id="id-display">
+    <p><strong>Your ID:</strong> <span id="your-id-text"></span></p>
+    <p><strong>Lover's ID:</strong> <span id="lover-id-text"></span></p>
   </div>
-
+  <button class="btn-swap" onclick="swapIDs()">Swap IDs</button>
   <div id="compass">
-    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" >
-      <!-- Compass Base -->
-      <rect width="64" height="64" fill="#777" />
-      <rect x="4" y="4" width="56" height="56" fill="#222" />
-      <rect x="8" y="8" width="48" height="48" fill="#ccc" />
-      <rect x="10" y="10" width="44" height="44" fill="#eee" />
-      <g fill="#333">
-        <rect x="31" y="8" width="2" height="8" />
-        <rect x="31" y="48" width="2" height="8" />
-        <rect x="8" y="31" width="8" height="2" />
-        <rect x="48" y="31" width="8" height="2" />
-      </g>
-
-      <!-- Needle Group -->
-      <g id="needle" transform="rotate(0 32 32)">
-        <rect x="30" y="12" width="4" height="20" fill="#ff4444" />
-        <rect x="28" y="12" width="8" height="4" fill="#ff4444" />
-        <rect x="30" y="32" width="4" height="20" fill="#fff" />
-        <rect x="28" y="48" width="8" height="4" fill="#fff" />
-      </g>
-    </svg>
+    <img
+      id="compass-base"
+      src="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/images/compass-base.png"
+      alt="Compass base"
+    />
+    <img
+      id="needle"
+      src=""
+      alt="Compass needle"
+    />
   </div>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
   <script>
-    // Firebase config (replace with your own if needed)
+    // Replace with your Firebase config (same as before)
     const firebaseConfig = {
       apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
       authDomain: "compassapp-cb4ed.firebaseapp.com",
@@ -121,40 +90,35 @@
       messagingSenderId: "820890755353",
       appId: "1:820890755353:web:d4e33e791f925166506588"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Get IDs from localStorage, redirect if missing
+    // Get stored IDs or redirect if missing
     let yourID = localStorage.getItem('yourID');
     let loverID = localStorage.getItem('loverID');
 
     if (!yourID || !loverID) {
-      alert("Please select IDs first.");
+      alert('IDs not found. Please select your IDs.');
       window.location.href = 'index.html';
     }
 
-    // Display IDs
-    const yourIDDisplay = document.getElementById('yourID-display');
-    const loverIDDisplay = document.getElementById('loverID-display');
-    yourIDDisplay.textContent = yourID;
-    loverIDDisplay.textContent = loverID;
+    document.getElementById('your-id-text').textContent = yourID;
+    document.getElementById('lover-id-text').textContent = loverID;
 
-    // Swap IDs function (updates UI and storage dynamically)
-    document.getElementById('swapBtn').addEventListener('click', () => {
+    function swapIDs() {
       [yourID, loverID] = [loverID, yourID];
       localStorage.setItem('yourID', yourID);
       localStorage.setItem('loverID', loverID);
-      yourIDDisplay.textContent = yourID;
-      loverIDDisplay.textContent = loverID;
-      // No reload needed — needle will keep working with updated IDs
-      startTracking();
-    });
+      document.getElementById('your-id-text').textContent = yourID;
+      document.getElementById('lover-id-text').textContent = loverID;
+      // Optionally reload location data or compass update here if needed
+    }
 
     // Bearing calculation helper
     function toRadians(deg) {
-      return deg * Math.PI / 180;
+      return (deg * Math.PI) / 180;
     }
+
     function calculateBearing(lat1, lon1, lat2, lon2) {
       const dLon = toRadians(lon2 - lon1);
       const y = Math.sin(dLon) * Math.cos(toRadians(lat2));
@@ -162,54 +126,71 @@
         Math.cos(toRadians(lat1)) * Math.sin(toRadians(lat2)) -
         Math.sin(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.cos(dLon);
       let brng = Math.atan2(y, x);
-      brng = brng * 180 / Math.PI;
+      brng = (brng * 180) / Math.PI;
       return (brng + 360) % 360;
     }
 
-    // Needle element
+    // Needle frames info
+    const baseURL = 'https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/images/needle-frames/';
+    const totalFrames = 29;
+
+    function getFrameURL(index) {
+      const paddedIndex = index.toString().padStart(2, '0');
+      return `${baseURL}frame_${paddedIndex}_delay-0.06s.png`;
+    }
+
+    // Preload needle frames
+    const needleFrames = [];
+    for (let i = 0; i < totalFrames; i++) {
+      needleFrames[i] = new Image();
+      needleFrames[i].src = getFrameURL(i);
+    }
+
     const needleEl = document.getElementById('needle');
-
-    // Positions
-    let yourPos = { lat: 0, lon: 0 };
-    let loverPos = { lat: 0, lon: 0 };
-
-    // Remove previous Firebase listeners before adding new (for swaps)
-    let loverRef = null;
+    let yourCoords = { lat: 0, lon: 0 };
+    let loverCoords = { lat: 0, lon: 0 };
 
     function updateCompass() {
-      if (!yourPos.lat || !loverPos.lat) return;
-      const bearing = calculateBearing(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon);
-      needleEl.setAttribute('transform', `rotate(${bearing} 32 32)`);
-    }
-
-    function startTracking() {
-      // Update your own location continuously
-      navigator.geolocation.watchPosition(
-        (pos) => {
-          yourPos = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-          db.ref('users/' + yourID).set(yourPos);
-          updateCompass();
-        },
-        (err) => alert('Enable GPS for Love Compass'),
-        { enableHighAccuracy: true }
+      const bearing = calculateBearing(
+        yourCoords.lat,
+        yourCoords.lon,
+        loverCoords.lat,
+        loverCoords.lon
       );
 
-      // Detach old listener if exists
-      if (loverRef) loverRef.off();
+      // Since frame_00 points south (180°), offset by 180°
+      let frameIndex = Math.round(((bearing + 180) % 360) / (360 / totalFrames));
+      frameIndex = frameIndex % totalFrames;
 
-      // Listen for lover's position changes
-      loverRef = db.ref('users/' + loverID);
-      loverRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data && data.lat != null && data.lon != null) {
-          loverPos = { lat: data.lat, lon: data.lon };
-          updateCompass();
-        }
-      });
+      needleEl.src = getFrameURL(frameIndex);
     }
 
-    // Start first tracking session
-    startTracking();
+    // Watch your location and update Firebase
+    navigator.geolocation.watchPosition(
+      (pos) => {
+        yourCoords.lat = pos.coords.latitude;
+        yourCoords.lon = pos.coords.longitude;
+        db.ref('users/' + yourID).set(yourCoords);
+      },
+      (err) => {
+        alert('Error getting location. Please enable GPS and reload.');
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 10000,
+        timeout: 5000,
+      }
+    );
+
+    // Listen for lover's location updates
+    db.ref('users/' + loverID).on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.lat != null && data.lon != null) {
+        loverCoords.lat = data.lat;
+        loverCoords.lon = data.lon;
+        updateCompass();
+      }
+    });
   </script>
 </body>
 </html>
