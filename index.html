@@ -4,23 +4,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Love Compass – Point to Friend</title>
+  <title>Love Compass – Select IDs</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background-color: #1d1d1d;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    .panel {
+      background: #333;
+      padding: 20px;
+      border: 3px solid white;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: 40px auto;
+    }
+    select, button {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 14px;
+      padding: 10px;
+      margin-top: 10px;
+      width: 90%;
+    }
+    .btn-start {
+      background-color: #444;
+      color: white;
+      border: 2px solid white;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <h1>Love Compass</h1>
-  <p>Your location is being shared in real time.</p>
-  <button class="btn-swap" onclick="swapIDs()">Swap IDs</button>
-  <div id="compass" aria-label="Minecraft-style compass">
-    <div id="needle"></div>
-    <div id="heart"></div>
-  </div>
-  <audio id="tick-sound" src="tick.mp3" preload="auto"></audio>
+  <div class="panel">
+    <label for="your-id">Your ID:</label>
+    <select id="your-id">
+      <option value="Serenitym16">Serenitym16</option>
+      <option value="athloi">athloi</option>
+    </select>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="script.js"></script>
+    <label for="lover-id">Lover's ID:</label>
+    <select id="lover-id">
+      <option value="athloi">athloi</option>
+      <option value="Serenitym16">Serenitym16</option>
+    </select>
+
+    <button class="btn-start" onclick="startCompass()">Start</button>
+  </div>
+
+  <script>
+    function startCompass() {
+      const yourID = document.getElementById('your-id').value;
+      const loverID = document.getElementById('lover-id').value;
+
+      if (yourID === loverID) {
+        alert("IDs must be different.");
+        return;
+      }
+
+      localStorage.setItem('yourID', yourID);
+      localStorage.setItem('loverID', loverID);
+      window.location.href = 'main.html';
+    }
+  </script>
 </body>
 </html>
