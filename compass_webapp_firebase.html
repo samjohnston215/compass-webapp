@@ -1,0 +1,114 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compass to Friend</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 2rem;
+      background-color: #1e1e1e;
+      color: white;
+    }
+    #compass {
+      margin-top: 2rem;
+      width: 200px;
+      height: 200px;
+      position: relative;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #needle {
+      width: 100%;
+      height: 100%;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Compass_rose_pale.svg/200px-Compass_rose_pale.svg.png') no-repeat center;
+      background-size: contain;
+      transform: rotate(0deg);
+      transition: transform 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <h1>Point to Friend</h1>
+  <p>Your location is being shared in real time.</p>
+  <div id="compass">
+    <div id="needle"></div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <script>
+    // STEP 1: Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
+      authDomain: "compassapp-cb4ed.firebaseapp.com",
+      databaseURL: "https://compassapp-cb4ed-default-rtdb.firebaseio.com",
+      projectId: "compassapp-cb4ed",
+      storageBucket: "compassapp-cb4ed.firebasestorage.app",
+      messagingSenderId: "820890755353",
+      appId: "1:820890755353:web:d4e33e791f925166506588",
+      measurementId: "G-4Z93K7XHP6"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // STEP 2: Get Device ID (for now, use prompt)
+    const yourID = prompt("Enter your ID (e.g., user1)");
+    const friendID = prompt("Enter your friend's ID (e.g., user2)");
+
+    function toRadians(deg) {
+      return deg * Math.PI / 180;
+    }
+
+    function calculateBearing(lat1, lon1, lat2, lon2) {
+      const dLon = toRadians(lon2 - lon1);
+      const y = Math.sin(dLon) * Math.cos(toRadians(lat2));
+      const x = Math.cos(toRadians(lat1)) * Math.sin(toRadians(lat2)) -
+                Math.sin(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.cos(dLon);
+      let bearing = Math.atan2(y, x);
+      bearing = bearing * (180 / Math.PI);
+      return (bearing + 360) % 360;
+    }
+
+    const needle = document.getElementById('needle');
+
+    let yourCoords = { lat: 0, lon: 0 };
+    let friendCoords = { lat: 0, lon: 0 };
+
+    function updateCompass() {
+      const bearing = calculateBearing(yourCoords.lat, yourCoords.lon, friendCoords.lat, friendCoords.lon);
+      needle.style.transform = `rotate(${bearing}deg)`;
+    }
+
+    // STEP 3: Watch your location and upload to Firebase
+    navigator.geolocation.watchPosition(position => {
+      yourCoords.lat = position.coords.latitude;
+      yourCoords.lon = position.coords.longitude;
+      db.ref('users/' + yourID).set(yourCoords);
+    }, error => {
+      alert("Error getting location. Make sure GPS is enabled.");
+    }, {
+      enableHighAccuracy: true,
+      maximumAge: 10000,
+      timeout: 5000
+    });
+
+    // STEP 4: Listen for your friend's location
+    db.ref('users/' + friendID).on('value', snapshot => {
+      const data = snapshot.val();
+      if (data && data.lat && data.lon) {
+        friendCoords.lat = data.lat;
+        friendCoords.lon = data.lon;
+        updateCompass();
+      }
+    });
+  </script>
+</body>
+</html>
