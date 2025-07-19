@@ -3,40 +3,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Compass to Friend</title>
+  <title>Minecraft Compass</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
     body {
-      font-family: sans-serif;
-      text-align: center;
       margin: 0;
-      padding: 2rem;
+      font-family: 'Press Start 2P', monospace;
       background-color: #1e1e1e;
-      color: white;
+      color: #fff;
+      text-align: center;
+      padding: 2rem;
     }
+
+    #welcome-screen {
+      background: url('https://i.imgur.com/7U5W2LS.png') center center / cover;
+      padding: 3rem;
+      border: 4px solid #555;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 20px #000;
+    }
+
+    #setup-panel {
+      background-color: #2d2d2d;
+      padding: 1rem;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    label, select {
+      font-size: 0.8rem;
+      margin: 0.5rem;
+      color: #fff;
+      background-color: #444;
+      border: 2px solid #777;
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #d22;
+    }
+
     #compass {
       width: 200px;
       height: 200px;
-      margin: 2rem auto 0;
+      margin: 2rem auto;
+    }
+
+    /* Twitch animation */
+    @keyframes twitch {
+      0%   { transform: rotate(0deg); }
+      25%  { transform: rotate(-2deg); }
+      50%  { transform: rotate(2deg); }
+      75%  { transform: rotate(-1deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    #needle.twitch {
+      animation: twitch 0.3s ease-in-out;
     }
   </style>
 </head>
 <body>
-  <h1>Point to Friend</h1>
-  <p>Your location is being shared in real time.</p>
+
+  <div id="welcome-screen">
+    <h1>🧭 Minecraft Compass</h1>
+    <p>Track your special person in real time.</p>
+  </div>
+
+  <div id="setup-panel">
+    <label for="yourID">Your Name:</label>
+    <select id="yourID">
+      <option value="Serenitym16">Serenitym16</option>
+      <option value="Athloi">Athloi</option>
+    </select>
+
+    <label for="friendID">Your Friend:</label>
+    <select id="friendID">
+      <option value="Athloi">Athloi</option>
+      <option value="Serenitym16">Serenitym16</option>
+    </select>
+  </div>
 
   <div id="compass">
     <svg id="compass-svg" viewBox="0 0 64 64" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <!-- Outer ring -->
       <circle cx="32" cy="32" r="30" fill="#5e5e5e" stroke="#1a1a1a" stroke-width="4"/>
-    
-      <!-- Inner face -->
       <circle cx="32" cy="32" r="24" fill="#aaa" stroke="#666" stroke-width="2"/>
-    
-      <!-- Needle group -->
       <g id="needle" transform="rotate(0, 32, 32)">
-        <!-- Red needle (points to target) -->
         <polygon points="32,8 28,32 36,32" fill="#d22" />
-        <!-- Tail needle (points opposite) -->
         <polygon points="32,56 28,32 36,32" fill="#333" />
       </g>
     </svg>
@@ -47,24 +103,18 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
   <script>
-    // Initialize Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
       authDomain: "compassapp-cb4ed.firebaseapp.com",
       databaseURL: "https://compassapp-cb4ed-default-rtdb.firebaseio.com",
       projectId: "compassapp-cb4ed",
-      storageBucket: "compassapp-cb4ed.firebasestorage.app",
+      storageBucket: "compassapp-cb4ed.appspot.com",
       messagingSenderId: "820890755353",
-      appId: "1:820890755353:web:d4e33e791f925166506588",
-      measurementId: "G-4Z93K7XHP6"
+      appId: "1:820890755353:web:d4e33e791f925166506588"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
-    // Get IDs
-    const yourID = prompt("Enter your ID (e.g., user1)");
-    const friendID = prompt("Enter your friend's ID (e.g., user2)");
 
     function toRadians(deg) {
       return deg * Math.PI / 180;
@@ -81,37 +131,51 @@
     }
 
     const needle = document.getElementById('needle');
-
     let yourCoords = { lat: 0, lon: 0 };
     let friendCoords = { lat: 0, lon: 0 };
 
     function updateCompass() {
       const bearing = calculateBearing(yourCoords.lat, yourCoords.lon, friendCoords.lat, friendCoords.lon);
-      needle.setAttribute('transform', `rotate(${bearing}, 32, 32)`);
+
+      // Animate twitch
+      needle.classList.remove('twitch');
+      void needle.offsetWidth;
+      needle.classList.add('twitch');
+
+      // Rotate after twitch
+      setTimeout(() => {
+        needle.setAttribute('transform', `rotate(${bearing}, 32, 32)`);
+      }, 300);
     }
 
-    // Watch your location and upload to Firebase
-    navigator.geolocation.watchPosition(position => {
-      yourCoords.lat = position.coords.latitude;
-      yourCoords.lon = position.coords.longitude;
-      db.ref('users/' + yourID).set(yourCoords);
-    }, error => {
-      alert("Error getting location. Make sure GPS is enabled.");
-    }, {
-      enableHighAccuracy: true,
-      maximumAge: 10000,
-      timeout: 5000
-    });
+    function startTracking() {
+      const yourID = document.getElementById('yourID').value;
+      const friendID = document.getElementById('friendID').value;
 
-    // Listen for friend's location
-    db.ref('users/' + friendID).on('value', snapshot => {
-      const data = snapshot.val();
-      if (data && data.lat && data.lon) {
-        friendCoords.lat = data.lat;
-        friendCoords.lon = data.lon;
-        updateCompass();
-      }
-    });
+      navigator.geolocation.watchPosition(position => {
+        yourCoords.lat = position.coords.latitude;
+        yourCoords.lon = position.coords.longitude;
+        db.ref('users/' + yourID).set(yourCoords);
+      }, error => {
+        alert("Error getting location. Make sure GPS is enabled.");
+      }, {
+        enableHighAccuracy: true,
+        maximumAge: 10000,
+        timeout: 5000
+      });
+
+      db.ref('users/' + friendID).on('value', snapshot => {
+        const data = snapshot.val();
+        if (data && data.lat && data.lon) {
+          friendCoords.lat = data.lat;
+          friendCoords.lon = data.lon;
+          updateCompass();
+        }
+      });
+    }
+
+    document.getElementById('yourID').addEventListener('change', startTracking);
+    document.getElementById('friendID').addEventListener('change', startTracking);
   </script>
 </body>
 </html>
