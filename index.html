@@ -1,35 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Love Compass – Welcome</title>
 
-  <!-- Minecraft-style pixel font -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
-    rel="stylesheet"
-  />
+  <!-- Minecraft-style font -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
 
   <style>
-    /* ——————————————
-       GLOBAL & BACKGROUND
-       —————————————— */
     body {
       margin: 0;
       padding: 2rem 1rem;
       font-family: 'Press Start 2P', monospace;
       background-color: #789262;
       background-image:
-        linear-gradient(0deg, transparent 24%, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.06) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.06) 75%, rgba(0,0,0,0.06) 76%, transparent 77%, transparent),
-        linear-gradient(90deg, transparent 24%, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.06) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.06) 75%, rgba(0,0,0,0.06) 76%, transparent 77%, transparent);
+        linear-gradient(0deg,transparent 24%,rgba(0,0,0,0.06)25%,rgba(0,0,0,0.06)26%,transparent 27%,transparent 74%,rgba(0,0,0,0.06)75%,rgba(0,0,0,0.06)76%,transparent 77%,transparent),
+        linear-gradient(90deg,transparent 24%,rgba(0,0,0,0.06)25%,rgba(0,0,0,0.06)26%,transparent 27%,transparent 74%,rgba(0,0,0,0.06)75%,rgba(0,0,0,0.06)76%,transparent 77%,transparent);
       background-size: 32px 32px;
       color: #eee;
       text-align: center;
-    }
-
-    h1, p {
-      margin: .5rem 0;
     }
 
     #welcome-panel {
@@ -38,14 +28,18 @@
       border-radius: 4px;
       padding: 1.5rem 1rem;
       max-width: 360px;
-      margin: 2rem auto;
+      margin: 3rem auto;
       box-shadow: 0 0 12px #000;
+    }
+
+    h1, p {
+      margin: .5rem 0;
     }
 
     label {
       display: block;
       margin: .75rem 0 .25rem;
-      font-size: .8rem;
+      font-size: .9rem;
     }
 
     select {
@@ -60,7 +54,7 @@
     }
 
     button {
-      margin-top: 1rem;
+      margin-top: 1.2rem;
       padding: .8rem 1rem;
       font-size: .9rem;
       background: #ff4444;
@@ -69,14 +63,12 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
     button:active {
       transform: translateY(1px);
     }
   </style>
 </head>
 <body>
-
   <div id="welcome-panel">
     <h1>Love Compass</h1>
     <p>Select your names</p>
@@ -98,10 +90,10 @@
 
   <script>
     document.getElementById('startBtn').addEventListener('click', () => {
-      const you = document.getElementById('yourID').value;
+      const you   = document.getElementById('yourID').value;
       const lover = document.getElementById('loverID').value;
       if (you === lover) {
-        alert("Choose two different names.");
+        alert('Please choose two different names.');
         return;
       }
       localStorage.setItem('yourID', you);
