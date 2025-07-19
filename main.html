@@ -41,6 +41,19 @@
       display: none; /* Hidden initially, shown when location ready */
     }
 
+    #lover-id-display {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 1rem;
+      color: white;
+      background: rgba(128, 128, 128, 0.5); /* gray with 50% opacity */
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 8px;
+      margin: 10px auto 0 auto;
+      max-width: fit-content;
+      user-select: none;
+    }
+
     #status-message {
       color: yellow;
       font-family: 'Press Start 2P', monospace;
@@ -57,11 +70,13 @@
 </head>
 <body>
   <div class="info-panel">
-    <div><strong>Your ID:</strong> <span id="yourName"></span></div>
-    <div><strong>Lover’s ID:</strong> <span id="loverName"></span></div>
+    <div><strong>User:</strong> <span id="yourName"></span></div>
   </div>
 
   <img id="compass-img" src="" alt="Compass Frame" />
+
+  <div id="lover-id-display"></div>
+
   <div id="status-message"></div>
 
   <!-- Firebase SDKs -->
@@ -97,7 +112,7 @@
     };
 
     document.getElementById('yourName').textContent = yourID;
-    document.getElementById('loverName').textContent = loverID;
+    document.getElementById('lover-id-display').textContent = loverID;
 
     // Update background color based on yourID
     function updateBackgroundColor(id) {
