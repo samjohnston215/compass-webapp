@@ -5,14 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Love Compass – Welcome</title>
 
-  <!-- External Minecraft-style font -->
+  <!-- Minecraft-style pixel font -->
   <link
     href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
     rel="stylesheet"
   />
 
   <style>
-    /* Global / Pixel-grass background */
+    /* ——————————————
+       GLOBAL & BACKGROUND
+       —————————————— */
     body {
       margin: 0;
       padding: 2rem 1rem;
@@ -27,7 +29,7 @@
     }
 
     h1, p {
-      margin: 0.5rem 0;
+      margin: .5rem 0;
     }
 
     #welcome-panel {
@@ -37,17 +39,18 @@
       padding: 1.5rem 1rem;
       max-width: 360px;
       margin: 2rem auto;
+      box-shadow: 0 0 12px #000;
     }
 
     label {
       display: block;
-      margin-bottom: 0.5rem;
-      font-size: 0.8rem;
+      margin: .75rem 0 .25rem;
+      font-size: .8rem;
     }
 
     select {
       width: 100%;
-      padding: 0.6rem;
+      padding: .6rem;
       font-size: 1rem;
       background: #222;
       color: #eee;
@@ -58,8 +61,8 @@
 
     button {
       margin-top: 1rem;
-      padding: 0.8rem 1rem;
-      font-size: 0.9rem;
+      padding: .8rem 1rem;
+      font-size: .9rem;
       background: #ff4444;
       color: #fff;
       border: none;
@@ -73,9 +76,10 @@
   </style>
 </head>
 <body>
+
   <div id="welcome-panel">
     <h1>Love Compass</h1>
-    <p>Select your name to begin</p>
+    <p>Select your names</p>
 
     <label for="yourID">Your Name</label>
     <select id="yourID">
@@ -83,14 +87,25 @@
       <option value="Athloi">Athloi</option>
     </select>
 
+    <label for="loverID">Lover’s Name</label>
+    <select id="loverID">
+      <option value="Athloi">Athloi</option>
+      <option value="Serenitym16">Serenitym16</option>
+    </select>
+
     <button id="startBtn">Start</button>
   </div>
 
   <script>
     document.getElementById('startBtn').addEventListener('click', () => {
-      const yourID = document.getElementById('yourID').value;
-      // Save selection and navigate to compass page
-      localStorage.setItem('yourID', yourID);
+      const you = document.getElementById('yourID').value;
+      const lover = document.getElementById('loverID').value;
+      if (you === lover) {
+        alert("Choose two different names.");
+        return;
+      }
+      localStorage.setItem('yourID', you);
+      localStorage.setItem('loverID', lover);
       window.location.href = 'compass.html';
     });
   </script>
