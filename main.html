@@ -1,0 +1,171 @@
+<!-- main.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Love Compass – Point to Friend</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background-color: #1d1d1d;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    #compass {
+      position: relative;
+      width: 128px;
+      height: 128px;
+      margin: 30px auto;
+    }
+    #compass-base,
+    #needle {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 128px;
+      height: 128px;
+      image-rendering: pixelated;
+    }
+    #needle {
+      transform-origin: 64px 64px;
+      transition: transform 0.3s ease-out;
+    }
+    .btn-swap {
+      background-color: #444;
+      color: white;
+      border: 2px solid white;
+      padding: 10px;
+      font-family: 'Press Start 2P', monospace;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Love Compass</h1>
+  <p>Your location is being shared in real time.</p>
+  <div id="id-display">
+    <p><strong>Your ID:</strong> <span id="your-id-text"></span></p>
+    <p><strong>Lover's ID:</strong> <span id="lover-id-text"></span></p>
+  </div>
+  <button class="btn-swap" onclick="swapIDs()">Swap IDs</button>
+  <div id="compass">
+    <img
+      id="compass-base"
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Minecraft_Compass.png/128px-Minecraft_Compass.png"
+      alt="Compass base"
+    />
+    <img
+      id="needle"
+      src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Minecraft_Compass_Arrow.png"
+      alt="Compass needle"
+    />
+  </div>
+  <audio id="tick-sound" src="tick.mp3" preload="auto"></audio>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
+      authDomain: "compassapp-cb4ed.firebaseapp.com",
+      databaseURL: "https://compassapp-cb4ed-default-rtdb.firebaseio.com",
+      projectId: "compassapp-cb4ed",
+      storageBucket: "compassapp-cb4ed.appspot.com",
+      messagingSenderId: "820890755353",
+      appId: "1:820890755353:web:d4e33e791f925166506588",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let yourID = localStorage.getItem('yourID');
+    let loverID = localStorage.getItem('loverID');
+
+    if (!yourID || !loverID) {
+      alert('IDs not set. Redirecting to selection page.');
+      window.location.href = 'index.html';
+    }
+
+    if (yourID === loverID) {
+      alert('IDs must be different.');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('your-id-text').textContent = yourID;
+    document.getElementById('lover-id-text').textContent = loverID;
+
+    function swapIDs() {
+      [yourID, loverID] = [loverID, yourID];
+      localStorage.setItem('yourID', yourID);
+      localStorage.setItem('loverID', loverID);
+      document.getElementById('your-id-text').textContent = yourID;
+      document.getElementById('lover-id-text').textContent = loverID;
+      location.reload();
+    }
+
+    function toRadians(deg) {
+      return (deg * Math.PI) / 180;
+    }
+
+    function calculateBearing(lat1, lon1, lat2, lon2) {
+      const dLon = toRadians(lon2 - lon1);
+      const y = Math.sin(dLon) * Math.cos(toRadians(lat2));
+      const x =
+        Math.cos(toRadians(lat1)) * Math.sin(toRadians(lat2)) -
+        Math.sin(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.cos(dLon);
+      let bearing = Math.atan2(y, x);
+      bearing = (bearing * 180) / Math.PI;
+      return (bearing + 360) % 360;
+    }
+
+    const needleEl = document.getElementById('needle');
+    const tick = document.getElementById('tick-sound');
+    let yourCoords = { lat: 0, lon: 0 };
+    let loverCoords = { lat: 0, lon: 0 };
+
+    function updateCompass() {
+      const bearing = calculateBearing(
+        yourCoords.lat,
+        yourCoords.lon,
+        loverCoords.lat,
+        loverCoords.lon
+      );
+      needleEl.style.transform = `rotate(${bearing}deg)`;
+      if (tick) tick.play();
+    }
+
+    navigator.geolocation.watchPosition(
+      (position) => {
+        yourCoords.lat = position.coords.latitude;
+        yourCoords.lon = position.coords.longitude;
+        db.ref('users/' + yourID).set(yourCoords);
+      },
+      (error) => {
+        alert('Error getting location. Make sure GPS is enabled.');
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 10000,
+        timeout: 5000,
+      }
+    );
+
+    db.ref('users/' + loverID).on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.lat != null && data.lon != null) {
+        loverCoords.lat = data.lat;
+        loverCoords.lon = data.lon;
+        updateCompass();
+      }
+    });
+
+    window.addEventListener('offline', () =>
+      alert("You're offline. Compass may not work.")
+    );
+  </script>
+</body>
+</html>
