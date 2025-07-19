@@ -89,12 +89,21 @@
     document.getElementById('yourName').textContent = yourID;
     document.getElementById('loverName').textContent = loverID;
 
-    // Background color
-    if (theme === 'serenity') {
-      document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
-    } else {
-      document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--athloi-lavender');
+    // Function to update background color dynamically
+    function updateBackgroundColor(id) {
+      if (id.toLowerCase() === 'serenitym16') {
+        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
+      } else if (id.toLowerCase() === 'athloi') {
+        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--athloi-lavender');
+      } else {
+        // default fallback
+        document.body.style.backgroundColor = '#1d1d1d';
+      }
     }
+    
+    // Set initial background color
+    updateBackgroundColor(yourID);
+
 
     function toRad(d) {
       return d * Math.PI / 180;
