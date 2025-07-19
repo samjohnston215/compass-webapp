@@ -5,14 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Love Compass</title>
 
-  <!-- External Minecraft-style font -->
+  <!-- Minecraft-style pixel font -->
   <link
     href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
     rel="stylesheet"
   />
 
   <style>
-    /* Global / Pixel-grass background */
+    /* ——————————————
+       GLOBAL & BACKGROUND
+       —————————————— */
     body {
       margin: 0;
       padding: 1rem;
@@ -27,7 +29,7 @@
     }
 
     h1, p {
-      margin: 0.3rem 0;
+      margin: .3rem 0;
     }
 
     #info-panel {
@@ -37,35 +39,18 @@
       padding: 1rem;
       max-width: 360px;
       margin: 1rem auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      box-shadow: 0 0 8px #000;
     }
 
     #info-panel div {
       text-align: left;
+      margin-bottom: .75rem;
     }
 
-    label {
+    #info-panel label {
       display: block;
-      font-size: 0.7rem;
-      margin-bottom: 0.3rem;
-    }
-
-    select {
-      width: 100%;
-      padding: 0.6rem;
-      font-size: 1rem;
-      background: #222;
-      color: #eee;
-      border: 2px solid #555;
-      border-radius: 4px;
-      appearance: none;
-    }
-
-    select:focus {
-      outline: none;
-      border-color: #ff4444;
+      font-size: .7rem;
+      margin-bottom: .3rem;
     }
 
     #compass {
@@ -76,7 +61,6 @@
 
     /* Enforce pixel-art rendering */
     svg {
-      image-rendering: -moz-crisp-edges;
       image-rendering: crisp-edges;
       image-rendering: pixelated;
       shape-rendering: crispEdges;
@@ -84,13 +68,11 @@
 
     /* Needle twitch */
     @keyframes twitch {
-      0%   { transform: rotate(0deg); }
-      25%  { transform: rotate(-2deg); }
-      50%  { transform: rotate(2deg); }
-      75%  { transform: rotate(-1deg); }
-      100% { transform: rotate(0deg); }
+      0%   { opacity: 1; }
+      50%  { opacity: 0.6; }
+      100% { opacity: 1; }
     }
-    #needle.twitch {
+    .twitch {
       animation: twitch 0.3s ease-in-out;
     }
 
@@ -98,44 +80,89 @@
     @media (max-width: 500px) {
       body { padding: 0.5rem; }
       #compass { width: 200px; height: 200px; }
-      select { font-size: 0.9rem; }
     }
   </style>
 </head>
 <body>
   <div id="info-panel">
-    <div><h1>Love Compass</h1></div>
+    <h1>Love Compass</h1>
+
     <div>
       <label>Your Name</label>
-      <div id="yourNameDisplay"></div>
+      <div id="yourName"></div>
     </div>
+
     <div>
-      <label for="friendID">Friend’s Name</label>
-      <select id="friendID">
-        <option value="Athloi">Athloi</option>
-        <option value="Serenitym16">Serenitym16</option>
-      </select>
+      <label>Lover’s Name</label>
+      <div id="loverName"></div>
     </div>
   </div>
 
   <div id="compass">
     <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-      <!-- Outer ring (pixel style) -->
-      <rect x="2" y="2" width="60" height="60" fill="#777" stroke="#333" stroke-width="4" />
-      <!-- Inner face -->
-      <rect x="6" y="6" width="52" height="52" fill="#ccc" stroke="#555" stroke-width="2" />
+      <!-- Pixel-art compass background -->
+      <rect x="0" y="0" width="64" height="64" fill="#777"/>
+      <rect x="4" y="4" width="56" height="56" fill="#222"/>
+      <rect x="8" y="8" width="48" height="48" fill="#ccc"/>
+      <rect x="10" y="10" width="44" height="44" fill="#eee"/>
+
       <!-- Tick marks -->
       <g fill="#333">
-        <rect x="31" y="8" width="2" height="8"/>
+        <rect x="31" y="8"  width="2" height="8"/>
         <rect x="31" y="48" width="2" height="8"/>
-        <rect x="8" y="31" width="8" height="2"/>
+        <rect x="8"  y="31" width="8" height="2"/>
         <rect x="48" y="31" width="8" height="2"/>
       </g>
-      <!-- Pixel-art needle -->
-      <g id="needle" transform="rotate(0,32,32)">
-        <polygon points="32,10 28,32 36,32" fill="#ff4444"/>
-        <polygon points="32,54 28,32 36,32" fill="#222"/>
-        <rect x="30" y="30" width="4" height="4" fill="#444"/>
+
+      <!-- 12 discrete needle sprites -->
+      <!-- Each group rotated at multiples of 30° around center (32,32) -->
+      <g class="needle-sprite" id="needle-0">   <!-- 0°   -->
+        <polygon points="32,12 28,32 36,32" fill="#ff4444"/>
+        <polygon points="32,52 28,32 36,32" fill="#fff"/>
+      </g>
+      <g class="needle-sprite" id="needle-1">   <!-- 30°  -->
+        <polygon points="44,18 32,32 34,30" fill="#ff4444"/>
+        <polygon points="20,46 32,32 30,34" fill="#fff"/>
+      </g>
+      <g class="needle-sprite" id="needle-2">   <!-- 60°  -->
+        <polygon points="48,32 32,32 34,36" fill="#ff4444"/>
+        <polygon points="16,32 32,32 30,28" fill="#fff"/>
+      </g>
+      <g class="needle-sprite" id="needle-3">   <!-- 90°  -->
+        <polygon points="44,44 32,32 32,34" fill="#ff4444"/>
+        <polygon points="20,20 32,32 32,30" fill="#fff"/>
+      </g>
+      <g class="needle-sprite" id="needle-4">   <!-- 120° -->
+        <polygon points="32,52 36,32 32,30" fill="#ff4444"/>
+        <polygon points="32,12 36,32 34,34" fill="#fff"/>
+      </g>
+      <g class="needle-sprite" id="needle-5">   <!-- 150° -->
+        <polygon points="18,44 32,32 30,34" fill="#ff4444"/>
+        <polygon points="46,20 32,32 34,30" fill="#fff"/>
+      </g>
+      <g class="needle-sprite" id="needle-6">   <!-- 180° -->
+        <polygon points="12,32 28,32 36,32" fill="#ff4444"/>
+        <polygon points="52,32 30,32 28,32" fill="#fff"/>
+      </g>
+      <g class="needle-sprite" id="needle-7">   <!-- 210° -->
+        <polygon points="18,20 32,32 30,30" fill="#ff4444"/>
+        <polygon points="46,44 32,32 34,34" fill="#fff"/>
+      </g>
+      <g class="needle-sprite" id="needle-8">   <!-- 240° -->
+        <polygon points="32,12 34,34 32,36" fill="#ff4444"/>
+        <polygon points="32,52 30,30 32,28" fill="#fff"/>
+      </g>
+      <g class="needle-sprite" id="needle-9">   <!-- 270° -->
+        <polygon points="44,18 32,32 32,34" fill="#ff4444"/>
+        <polygon points="20,46 32,32 30,30" fill="#fff"/>
+      </g>
+      <g class="needle-sprite" id="needle-10">  <!-- 300° -->
+        <polygon points="48,32 28,32 30,34" fill="#ff4444"/>
+        <polygon points="16,32 36,32 34,30" fill="#fff"/>
+      </g>
+      <g class="needle-sprite" id="needle-11">  <!-- 330° -->
+        <polygon points="44,44 32,32 32,30" fill="#ff4444"/>
+        <polygon points="20,20 32,32 34,34" fill="#fff"/>
       </g>
     </svg>
   </div>
@@ -145,12 +172,14 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
   <script>
-    // Redirect back if no name chosen
-    const yourID = localStorage.getItem('yourID');
-    if (!yourID) {
-      window.location.href = 'index.html';
+    // Redirect home if no user
+    const you = localStorage.getItem('yourID');
+    const lover = localStorage.getItem('loverID');
+    if (!you || !lover) {
+      location.href = 'index.html';
     }
-    document.getElementById('yourNameDisplay').textContent = yourID;
+    document.getElementById('yourName').textContent = you;
+    document.getElementById('loverName').textContent = lover;
 
     // Firebase init
     const firebaseConfig = {
@@ -167,67 +196,57 @@
 
     // Helpers
     function toRad(d){return d*Math.PI/180;}
-    function calcBearing(la1,lo1,la2,lo2){
-      const dLon = toRad(lo2 - lo1);
-      const y = Math.sin(dLon)*Math.cos(toRad(la2));
-      const x = Math.cos(toRad(la1))*Math.sin(toRad(la2))
-              - Math.sin(toRad(la1))*Math.cos(toRad(la2))*Math.cos(dLon);
-      let b = Math.atan2(y,x)*180/Math.PI;
-      return (b + 360) % 360;
+    function bearing(lat1,lon1,lat2,lon2){
+      const dLon = toRad(lon2-lon1),
+            y = Math.sin(dLon)*Math.cos(toRad(lat2)),
+            x = Math.cos(toRad(lat1))*Math.sin(toRad(lat2))
+              - Math.sin(toRad(lat1))*Math.cos(toRad(lat2))*Math.cos(dLon);
+      return (Math.atan2(y,x)*180/Math.PI + 360) % 360;
     }
 
-    const needle = document.getElementById('needle');
-    let yourCoords = {}, friendCoords = {};
+    let yourPos = {}, loverPos = {};
 
-    function updateCompass() {
-      const brg = calcBearing(
-        yourCoords.lat, yourCoords.lon,
-        friendCoords.lat, friendCoords.lon
+    function showNeedle(angleDeg) {
+      // pick index 0–11
+      const idx = Math.floor(angleDeg/30) % 12;
+      document.querySelectorAll('.needle-sprite')
+        .forEach((g,i) => {
+          g.style.display = i === idx ? 'block' : 'none';
+        });
+
+      // quick twitch
+      const g = document.getElementById('needle-'+idx);
+      g.classList.remove('twitch');
+      void g.offsetWidth;
+      g.classList.add('twitch');
+    }
+
+    function update() {
+      const brg = bearing(
+        yourPos.lat, yourPos.lon,
+        loverPos.lat, loverPos.lon
       );
-      // twitch
-      needle.classList.remove('twitch');
-      void needle.offsetWidth;
-      needle.classList.add('twitch');
-      // rotate after twitch
-      setTimeout(() => {
-        needle.setAttribute('transform', `rotate(${brg},32,32)`);
-      }, 300);
+      showNeedle(brg);
     }
 
-    function startTracking() {
-      const friendID = document.getElementById('friendID').value;
+    function start() {
+      // watch yours
+      navigator.geolocation.watchPosition(p => {
+        yourPos = { lat: p.coords.latitude, lon: p.coords.longitude };
+        db.ref('users/'+ you).set(yourPos);
+      }, e => alert('Enable GPS'), {enableHighAccuracy:true});
 
-      // your geolocation
-      navigator.geolocation.watchPosition(pos => {
-        yourCoords = {
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude
-        };
-        db.ref('users/' + yourID).set(yourCoords);
-      }, err => {
-        alert('Enable GPS to use the Love Compass');
-      }, {
-        enableHighAccuracy: true,
-        maximumAge: 10000,
-        timeout: 5000
-      });
-
-      // friend’s location from Firebase
-      db.ref('users/' + friendID).on('value', snap => {
+      // watch lover
+      db.ref('users/'+ lover).on('value', snap => {
         const d = snap.val();
         if (d && d.lat && d.lon) {
-          friendCoords = { lat: d.lat, lon: d.lon };
-          updateCompass();
+          loverPos = { lat: d.lat, lon: d.lon };
+          update();
         }
       });
     }
 
-    // whenever they pick a friend, (re)start tracking
-    document.getElementById('friendID')
-      .addEventListener('change', startTracking);
-
-    // initial kickoff
-    startTracking();
+    start();
   </script>
 </body>
 </html>
