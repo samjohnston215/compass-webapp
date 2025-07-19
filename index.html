@@ -9,35 +9,53 @@
     body {
       margin: 0;
       font-family: 'Press Start 2P', monospace;
-      background-color: #1e1e1e;
+      background-color: #121212;
       color: #fff;
       text-align: center;
-      padding: 2rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1, p {
+      margin: 0.5rem 0;
     }
 
     #welcome-screen {
       background: url('https://i.imgur.com/7U5W2LS.png') center center / cover;
-      padding: 3rem;
+      padding: 1rem;
       border: 4px solid #555;
       border-radius: 8px;
-      margin-bottom: 2rem;
-      box-shadow: 0 0 20px #000;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 12px #000;
+      width: 90%;
+      max-width: 400px;
     }
 
     #setup-panel {
-      background-color: #2d2d2d;
+      background-color: #2e2e2e;
       padding: 1rem;
       border-radius: 8px;
-      display: inline-block;
+      width: 90%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
     }
 
-    label, select {
-      font-size: 0.8rem;
-      margin: 0.5rem;
-      color: #fff;
+    label {
+      font-size: 0.7rem;
+      margin-bottom: 0.3rem;
+    }
+
+    select {
+      font-size: 1rem;
+      padding: 0.6rem;
       background-color: #444;
+      color: #fff;
       border: 2px solid #777;
-      padding: 0.5rem;
       border-radius: 4px;
     }
 
@@ -47,12 +65,10 @@
     }
 
     #compass {
-      width: 200px;
-      height: 200px;
-      margin: 2rem auto;
+      width: 240px;
+      height: 240px;
     }
 
-    /* Twitch animation */
     @keyframes twitch {
       0%   { transform: rotate(0deg); }
       25%  { transform: rotate(-2deg); }
@@ -64,36 +80,53 @@
     #needle.twitch {
       animation: twitch 0.3s ease-in-out;
     }
+
+    @media (max-width: 500px) {
+      body {
+        font-size: 0.85rem;
+        padding: 1rem 0.5rem;
+      }
+      select {
+        font-size: 0.9rem;
+      }
+    }
   </style>
 </head>
 <body>
 
   <div id="welcome-screen">
     <h1>🧭 Minecraft Compass</h1>
-    <p>Track your special person in real time.</p>
+    <p>Real-time direction to your favorite person.</p>
   </div>
 
   <div id="setup-panel">
-    <label for="yourID">Your Name:</label>
-    <select id="yourID">
-      <option value="Serenitym16">Serenitym16</option>
-      <option value="Athloi">Athloi</option>
-    </select>
-
-    <label for="friendID">Your Friend:</label>
-    <select id="friendID">
-      <option value="Athloi">Athloi</option>
-      <option value="Serenitym16">Serenitym16</option>
-    </select>
+    <div>
+      <label for="yourID">Your Name:</label>
+      <select id="yourID">
+        <option value="Serenitym16">Serenitym16</option>
+        <option value="Athloi">Athloi</option>
+      </select>
+    </div>
+    <div>
+      <label for="friendID">Friend's Name:</label>
+      <select id="friendID">
+        <option value="Athloi">Athloi</option>
+        <option value="Serenitym16">Serenitym16</option>
+      </select>
+    </div>
   </div>
 
   <div id="compass">
     <svg id="compass-svg" viewBox="0 0 64 64" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="32" cy="32" r="30" fill="#5e5e5e" stroke="#1a1a1a" stroke-width="4"/>
-      <circle cx="32" cy="32" r="24" fill="#aaa" stroke="#666" stroke-width="2"/>
+      <!-- Compass ring -->
+      <circle cx="32" cy="32" r="30" fill="#636363" stroke="#2b2b2b" stroke-width="4"/>
+      <!-- Compass face -->
+      <circle cx="32" cy="32" r="24" fill="#c0c0c0" stroke="#5a5a5a" stroke-width="2"/>
+      <!-- Minecraft-style needle -->
       <g id="needle" transform="rotate(0, 32, 32)">
-        <polygon points="32,8 28,32 36,32" fill="#d22" />
-        <polygon points="32,56 28,32 36,32" fill="#333" />
+        <polygon points="32,10 26,32 38,32" fill="#ff4444" />
+        <polygon points="32,54 26,32 38,32" fill="#333" />
+        <rect x="30" y="26" width="4" height="12" fill="#222" />
       </g>
     </svg>
   </div>
