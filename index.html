@@ -4,71 +4,105 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Minecraft Compass</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
+    /* -------------------------
+       GLOBAL & BACKGROUND
+       ------------------------- */
     body {
       margin: 0;
-      font-family: 'Press Start 2P', monospace;
-      background-color: #121212;
-      color: #fff;
-      text-align: center;
       padding: 1rem;
+      font-family: monospace;
+      color: #eeeeee;
+      text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
+
+      /* Grass-like pixel grid */
+      background-color: #789262;
+      background-image:
+        linear-gradient(0deg, transparent 24%, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.06) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.06) 75%, rgba(0,0,0,0.06) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.06) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.06) 75%, rgba(0,0,0,0.06) 76%, transparent 77%, transparent);
+      background-size: 32px 32px;
     }
 
     h1, p {
-      margin: 0.5rem 0;
+      margin: 0.2rem 0;
     }
 
+    /* -------------------------
+       WELCOME PANEL
+       ------------------------- */
     #welcome-screen {
-      background: url('https://i.imgur.com/7U5W2LS.png') center center / cover;
+      background-color: rgba(0,0,0,0.6);
+      border: 4px solid #444;
+      border-radius: 4px;
       padding: 1rem;
-      border: 4px solid #555;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      box-shadow: 0 0 12px #000;
       width: 90%;
-      max-width: 400px;
+      max-width: 360px;
+      box-shadow: 0 0 12px #000;
+      margin-bottom: 1rem;
     }
 
+    /* -------------------------
+       SETUP PANEL
+       ------------------------- */
     #setup-panel {
-      background-color: #2e2e2e;
+      background-color: rgba(0,0,0,0.6);
+      border: 4px solid #444;
+      border-radius: 4px;
       padding: 1rem;
-      border-radius: 8px;
       width: 90%;
-      max-width: 400px;
+      max-width: 360px;
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
 
-    label {
-      font-size: 0.7rem;
-      margin-bottom: 0.3rem;
+    #setup-panel label {
+      display: block;
+      font-size: 0.75rem;
+      margin-bottom: 0.2rem;
     }
 
-    select {
-      font-size: 1rem;
+    #setup-panel select {
+      width: 100%;
       padding: 0.6rem;
-      background-color: #444;
-      color: #fff;
-      border: 2px solid #777;
+      font-size: 1rem;
+      background-color: #222;
+      color: #eee;
+      border: 2px solid #555;
       border-radius: 4px;
+      appearance: none;
     }
 
-    select:focus {
+    #setup-panel select:focus {
       outline: none;
-      border-color: #d22;
+      border-color: #ff4444;
     }
 
+    /* -------------------------
+       COMPASS CONTAINER
+       ------------------------- */
     #compass {
       width: 240px;
       height: 240px;
     }
 
+    /* -------------------------
+       PIXEL-ART SVG STYLING
+       ------------------------- */
+    svg {
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
+      shape-rendering: crispEdges;
+    }
+
+    /* -------------------------
+       NEEDLE TWITCH ANIMATION
+       ------------------------- */
     @keyframes twitch {
       0%   { transform: rotate(0deg); }
       25%  { transform: rotate(-2deg); }
@@ -81,14 +115,13 @@
       animation: twitch 0.3s ease-in-out;
     }
 
+    /* -------------------------
+       RESPONSIVE ADJUSTMENTS
+       ------------------------- */
     @media (max-width: 500px) {
-      body {
-        font-size: 0.85rem;
-        padding: 1rem 0.5rem;
-      }
-      select {
-        font-size: 0.9rem;
-      }
+      body { padding: 0.5rem; }
+      #compass { width: 200px; height: 200px; }
+      #setup-panel select { font-size: 0.9rem; }
     }
   </style>
 </head>
@@ -96,19 +129,19 @@
 
   <div id="welcome-screen">
     <h1>🧭 Minecraft Compass</h1>
-    <p>Real-time direction to your favorite person.</p>
+    <p>Always point to your favorite person.</p>
   </div>
 
   <div id="setup-panel">
     <div>
-      <label for="yourID">Your Name:</label>
+      <label for="yourID">Your Name</label>
       <select id="yourID">
         <option value="Serenitym16">Serenitym16</option>
         <option value="Athloi">Athloi</option>
       </select>
     </div>
     <div>
-      <label for="friendID">Friend's Name:</label>
+      <label for="friendID">Friend’s Name</label>
       <select id="friendID">
         <option value="Athloi">Athloi</option>
         <option value="Serenitym16">Serenitym16</option>
@@ -117,16 +150,26 @@
   </div>
 
   <div id="compass">
-    <svg id="compass-svg" viewBox="0 0 64 64" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <!-- Compass ring -->
-      <circle cx="32" cy="32" r="30" fill="#636363" stroke="#2b2b2b" stroke-width="4"/>
-      <!-- Compass face -->
-      <circle cx="32" cy="32" r="24" fill="#c0c0c0" stroke="#5a5a5a" stroke-width="2"/>
-      <!-- Minecraft-style needle -->
+    <svg viewBox="0 0 64 64" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer ring -->
+      <rect x="2" y="2" width="60" height="60" fill="#777" stroke="#333" stroke-width="4" />
+      <!-- Inner face -->
+      <rect x="6" y="6" width="52" height="52" fill="#ccc" stroke="#555" stroke-width="2" />
+      <!-- Blocky tick marks -->
+      <g fill="#333">
+        <rect x="31" y="8" width="2" height="8"/>
+        <rect x="31" y="48" width="2" height="8"/>
+        <rect x="8" y="31" width="8" height="2"/>
+        <rect x="48" y="31" width="8" height="2"/>
+      </g>
+      <!-- Pixel-style needle -->
       <g id="needle" transform="rotate(0, 32, 32)">
-        <polygon points="32,10 26,32 38,32" fill="#ff4444" />
-        <polygon points="32,54 26,32 38,32" fill="#333" />
-        <rect x="30" y="26" width="4" height="12" fill="#222" />
+        <!-- Red tip -->
+        <polygon points="32,10 28,32 36,32" fill="#ff4444"/>
+        <!-- Gray tail -->
+        <polygon points="32,54 28,32 36,32" fill="#222"/>
+        <!-- Center block -->
+        <rect x="30" y="30" width="4" height="4" fill="#444"/>
       </g>
     </svg>
   </div>
@@ -136,6 +179,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
   <script>
+    // Firebase init
     const firebaseConfig = {
       apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
       authDomain: "compassapp-cb4ed.firebaseapp.com",
@@ -145,68 +189,62 @@
       messagingSenderId: "820890755353",
       appId: "1:820890755353:web:d4e33e791f925166506588"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function toRadians(deg) {
-      return deg * Math.PI / 180;
-    }
-
-    function calculateBearing(lat1, lon1, lat2, lon2) {
-      const dLon = toRadians(lon2 - lon1);
-      const y = Math.sin(dLon) * Math.cos(toRadians(lat2));
-      const x = Math.cos(toRadians(lat1)) * Math.sin(toRadians(lat2)) -
-                Math.sin(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.cos(dLon);
-      let bearing = Math.atan2(y, x);
-      bearing = bearing * (180 / Math.PI);
-      return (bearing + 360) % 360;
+    // Helpers
+    function toRad(d){return d*Math.PI/180;}
+    function calculateBearing(la1,lo1,la2,lo2){
+      let dLon = toRad(lo2-lo1);
+      let y = Math.sin(dLon)*Math.cos(toRad(la2));
+      let x = Math.cos(toRad(la1))*Math.sin(toRad(la2)) -
+              Math.sin(toRad(la1))*Math.cos(toRad(la2))*Math.cos(dLon);
+      let brg = Math.atan2(y,x)*180/Math.PI;
+      return (brg+360)%360;
     }
 
     const needle = document.getElementById('needle');
-    let yourCoords = { lat: 0, lon: 0 };
-    let friendCoords = { lat: 0, lon: 0 };
+    let yourCoords = {}, friendCoords = {};
 
-    function updateCompass() {
-      const bearing = calculateBearing(yourCoords.lat, yourCoords.lon, friendCoords.lat, friendCoords.lon);
-
-      // Animate twitch
+    function updateCompass(){
+      const brg = calculateBearing(
+        yourCoords.lat, yourCoords.lon,
+        friendCoords.lat, friendCoords.lon
+      );
       needle.classList.remove('twitch');
       void needle.offsetWidth;
       needle.classList.add('twitch');
-
-      // Rotate after twitch
-      setTimeout(() => {
-        needle.setAttribute('transform', `rotate(${bearing}, 32, 32)`);
-      }, 300);
+      setTimeout(()=>{
+        needle.setAttribute('transform', `rotate(${brg},32,32)`);
+      },300);
     }
 
-    function startTracking() {
-      const yourID = document.getElementById('yourID').value;
-      const friendID = document.getElementById('friendID').value;
+    function startTracking(){
+      const you = document.getElementById('yourID').value;
+      const fr  = document.getElementById('friendID').value;
 
-      navigator.geolocation.watchPosition(position => {
-        yourCoords.lat = position.coords.latitude;
-        yourCoords.lon = position.coords.longitude;
-        db.ref('users/' + yourID).set(yourCoords);
-      }, error => {
-        alert("Error getting location. Make sure GPS is enabled.");
-      }, {
+      navigator.geolocation.watchPosition(pos=>{
+        yourCoords = {
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude
+        };
+        db.ref('users/'+you).set(yourCoords);
+      },{
         enableHighAccuracy: true,
         maximumAge: 10000,
         timeout: 5000
       });
 
-      db.ref('users/' + friendID).on('value', snapshot => {
-        const data = snapshot.val();
-        if (data && data.lat && data.lon) {
-          friendCoords.lat = data.lat;
-          friendCoords.lon = data.lon;
+      db.ref('users/'+fr).on('value',snap=>{
+        const d = snap.val();
+        if(d && d.lat && d.lon) {
+          friendCoords = { lat: d.lat, lon: d.lon };
           updateCompass();
         }
       });
     }
 
+    // kick off on any change
     document.getElementById('yourID').addEventListener('change', startTracking);
     document.getElementById('friendID').addEventListener('change', startTracking);
   </script>
