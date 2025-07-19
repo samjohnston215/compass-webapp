@@ -1,9 +1,8 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Compass to Friend</title>
   <style>
     body {
@@ -15,28 +14,30 @@
       color: white;
     }
     #compass {
-      margin-top: 2rem;
       width: 200px;
       height: 200px;
-      position: relative;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #needle {
-      width: 100%;
-      height: 100%;
-      background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Compass_rose_pale.svg/200px-Compass_rose_pale.svg.png') no-repeat center;
-      background-size: contain;
-      transform: rotate(0deg);
-      transition: transform 0.3s ease;
+      margin: 2rem auto 0;
     }
   </style>
 </head>
 <body>
   <h1>Point to Friend</h1>
   <p>Your location is being shared in real time.</p>
+
   <div id="compass">
-    <div id="needle"></div>
+    <svg id="compass-svg" viewBox="0 0 64 64" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <!-- Compass base -->
+      <rect x="2" y="2" width="60" height="60" fill="#7a7a7a" stroke="#000" stroke-width="4" rx="8" ry="8"/>
+      <!-- Compass face -->
+      <line x1="32" y1="8" x2="32" y2="56" stroke="#000" stroke-width="2"/>
+      <line x1="8" y1="32" x2="56" y2="32" stroke="#000" stroke-width="2"/>
+      <!-- Needle -->
+      <g id="needle" transform="rotate(0, 32, 32)">
+        <rect x="30" y="12" width="4" height="20" fill="#d22" />
+        <polygon points="32,6 26,18 38,18" fill="#d22" />
+        <polygon points="32,32 26,44 38,44" fill="#444" />
+      </g>
+    </svg>
   </div>
 
   <!-- Firebase SDKs -->
@@ -44,7 +45,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
   <script>
-    // STEP 1: Initialize Firebase
+    // Initialize Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
       authDomain: "compassapp-cb4ed.firebaseapp.com",
@@ -59,7 +60,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // STEP 2: Get Device ID (for now, use prompt)
+    // Get IDs
     const yourID = prompt("Enter your ID (e.g., user1)");
     const friendID = prompt("Enter your friend's ID (e.g., user2)");
 
@@ -84,10 +85,10 @@
 
     function updateCompass() {
       const bearing = calculateBearing(yourCoords.lat, yourCoords.lon, friendCoords.lat, friendCoords.lon);
-      needle.style.transform = `rotate(${bearing}deg)`;
+      needle.setAttribute('transform', `rotate(${bearing}, 32, 32)`);
     }
 
-    // STEP 3: Watch your location and upload to Firebase
+    // Watch your location and upload to Firebase
     navigator.geolocation.watchPosition(position => {
       yourCoords.lat = position.coords.latitude;
       yourCoords.lon = position.coords.longitude;
@@ -100,7 +101,7 @@
       timeout: 5000
     });
 
-    // STEP 4: Listen for your friend's location
+    // Listen for friend's location
     db.ref('users/' + friendID).on('value', snapshot => {
       const data = snapshot.val();
       if (data && data.lat && data.lon) {
