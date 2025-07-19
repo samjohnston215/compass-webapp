@@ -153,7 +153,7 @@
 
     // Minecraft chat style status bottom left
     const statusBottomLeft = document.getElementById('status-bottom-left');
-    statusBottomLeft.textContent = `${yourID} is looking for ${loverID}`;
+    statusBottomLeft.innerHTML = `<span style="color:gold">${yourID}</span> is looking for <span style="color:gold">${loverID}</span>`;
 
     function toRad(d) {
       return d * Math.PI / 180;
