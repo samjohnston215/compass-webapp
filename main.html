@@ -41,16 +41,16 @@
       display: none; /* Hidden initially, shown when location ready */
     }
 
-    #lover-id-display {
+    #lover-id-box {
+      max-width: 400px;
+      margin: 1rem auto 0 auto;
       font-family: 'Press Start 2P', monospace;
-      font-size: 1rem;
+      font-size: 16px;
       color: white;
-      background: rgba(128, 128, 128, 0.5); /* gray with 50% opacity */
-      display: inline-block;
-      padding: 6px 12px;
+      background: rgba(128,128,128,0.6);
+      padding: 8px 12px;
       border-radius: 8px;
-      margin: 10px auto 0 auto;
-      max-width: fit-content;
+      display: inline-block;
       user-select: none;
     }
 
@@ -61,9 +61,29 @@
       min-height: 1.4em;
     }
 
+    #status-bottom-left {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      color: #00ff00;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 6px 10px;
+      border: 1px solid #00ff00;
+      border-radius: 4px;
+      user-select: none;
+      z-index: 9999;
+      white-space: nowrap;
+    }
+
     @media (max-width: 500px) {
       #compass-img {
         max-width: 95vmin;
+      }
+      #lover-id-box {
+        font-size: 14px;
+        max-width: 90vw;
       }
     }
   </style>
@@ -74,10 +94,9 @@
   </div>
 
   <img id="compass-img" src="" alt="Compass Frame" />
-
-  <div id="lover-id-display"></div>
-
+  <div id="lover-id-box"></div>
   <div id="status-message"></div>
+  <div id="status-bottom-left"></div>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -112,7 +131,7 @@
     };
 
     document.getElementById('yourName').textContent = yourID;
-    document.getElementById('lover-id-display').textContent = loverID;
+    document.getElementById('lover-id-box').textContent = loverID;
 
     // Update background color based on yourID
     function updateBackgroundColor(id) {
@@ -125,6 +144,10 @@
       }
     }
     updateBackgroundColor(yourID);
+
+    // Minecraft chat style status bottom left
+    const statusBottomLeft = document.getElementById('status-bottom-left');
+    statusBottomLeft.textContent = `${yourID} is looking for ${loverID}`;
 
     function toRad(d) {
       return d * Math.PI / 180;
