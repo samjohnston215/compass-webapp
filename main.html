@@ -89,6 +89,14 @@
     .loading-dot.on {
       background: gold;
     }
+    #distance-display {
+      margin: 10px 0 0 0;
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--text-highlight);
+      user-select: none;
+      min-height: 24px;
+    }
     #compass-wrapper {
       display: flex;
       justify-content: center;
@@ -198,7 +206,10 @@
         <img id="lover-avatar" class="avatar" src="" alt="Lover Avatar" />
       </div>
     </div>
-    <div id="status-message" role="status" aria-live="polite"></div>
+
+    <!-- New distance display -->
+    <div id="distance-display" aria-live="polite" aria-atomic="true"></div>
+
     <div id="compass-wrapper">
       <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Needle" />
     </div>
@@ -256,6 +267,7 @@
     const loverNameBox = document.getElementById('loverNameBox');
     const yourAvatarImg = document.getElementById('your-avatar');
     const loverAvatarImg = document.getElementById('lover-avatar');
+    const distanceDisplay = document.getElementById('distance-display');
 
     // Sanitize function for chat messages
     function sanitize(text) {
@@ -360,11 +372,18 @@
         const dist = getDistanceMiles(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon).toFixed(1);
         const dir = getCardinalDirection(brg);
         showNeedle(brg);
-        const targetName = yourID.toLowerCase() === 'athloi' ? 'Serenitym16' : 'athloi';
-        statusMsg.textContent = `You are ${dist} miles ${dir} of ${targetName}`;
+
+        // Determine other user's name for the message
+        const otherUser = yourID.toLowerCase() === 'athloi' ? 'Serenitym16' : 'athloi';
+
+        statusMsg.textContent = `You are ${dist} miles ${dir} of ${otherUser}`;
+
+        // Update the new distance display as requested
+        distanceDisplay.textContent = `You are ${dist} miles (${dir}) away from ${otherUser}`;
       } else {
         showNeedle(null);
         statusMsg.textContent = '';
+        distanceDisplay.textContent = '';
       }
     }
 
@@ -386,8 +405,6 @@
           updateCompass();
           statusMsg.textContent = '';
           lastLoverUpdate = Date.now();
-          // Set loading dots color (optional, here just toggling class 'on')
-          // We won't change colors here because loading dots animation runs independently.
         } else {
           loverPos = null;
           updateCompass();
