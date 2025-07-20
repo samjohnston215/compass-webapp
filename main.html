@@ -93,8 +93,9 @@
 
     #chat-wrapper {
       position: fixed;
-      bottom: 0;
+      bottom: 20px;
       left: 20px;          /* Align left side with some margin */
+      right: 10px;
       transform: none;     /* Remove centering */
       width: auto;         /* auto width to fit content */
       max-width: 90vw;
@@ -124,7 +125,8 @@
       user-select: text;
       height: 32px;
       box-sizing: border-box;
-      box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.4); /* light gray shadow top-left */
+      border-radius: 0;
+      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11; /* match trash icon effect */
     }
     
     #chat-input::placeholder {
