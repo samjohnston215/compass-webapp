@@ -40,35 +40,39 @@
 
     /* Chat messages container: remove bg and border so chat messages' bg is visible */
     #chat-messages {
-      background-color: rgba(34, 34, 34, 0.8); /* dark gray with transparency */
+      background-color: rgba(34, 34, 34, 0.8); /* single transparent dark gray box */
       border: none !important;
       border-radius: 0; /* squared corners */
-      padding: 10px 12px 10px 16px; /* top,right,bottom,left padding, more on left for text spacing */
+      padding: 10px 16px; /* padding for left spacing */
       margin: 0;
       font-size: 13px;
       line-height: 1.4;
       max-height: 100%;
       overflow-y: auto;
-      text-align: left; /* align text to left */
+      text-align: left;
       color: var(--text-light);
       box-sizing: border-box;
       user-select: text;
       font-family: var(--font-family);
     }
-
-    /* Individual sent chat messages */
+    
     .chat-message {
-      background-color: rgba(34, 34, 34, 0.8) !important; /* dark gray, transparent */
+      background: none !important; /* remove individual message backgrounds */
       border: none !important;
-      padding: 6px 10px;
+      padding: 0;
       margin-bottom: 6px;
-      border-radius: 6px;
+      border-radius: 0;
       word-break: break-word;
       user-select: text;
       font-family: var(--font-family);
       font-size: 13px;
       line-height: 1.4;
-      color: var(--text-light);
+      color: white; /* default message text color */
+    }
+
+    /* For the sender's name inside the message */
+    .chat-message strong {
+      color: yellow; /* user name in yellow */
     }
 
     #logs-container {
