@@ -73,13 +73,26 @@
       font-size: 14px;
       color: var(--text-highlight);
     }
+    #loading-bar-container::after {
+      content: '✖';
+      display: none;
+      color: red;
+      font-size: 20px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+    }
+    #loading-bar-container.error::after {
+      display: block;
+    }
   </style>
 </head>
 <body>
   <div class="info-panel">
     <div><strong>User:</strong> <span id="yourName"></span></div>
   </div>
-
   <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; margin-bottom: 1rem;">
     <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 90vw; max-width: 600px;">
       <div style="text-align: center; flex: 1;">
@@ -88,7 +101,7 @@
       </div>
       <div style="flex: 1; display: flex; justify-content: center;">
         <div id="loading-bar-container" style="width: 100px; height: 16px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; position: relative; margin-bottom: 20px;">
-          <div id="loading-bar" style="background: var(--serenity-green); width: 0%; height: 100%; border-radius: 10px;"></div>
+          <div id="loading-bar" style="background: white; width: 0%; height: 100%; border-radius: 10px;"></div>
         </div>
       </div>
       <div style="text-align: center; flex: 1;">
@@ -96,22 +109,19 @@
         <img id="lover-avatar" src="" alt="Lover Avatar" style="width: 90px; height: 90px; border-radius: 10px; image-rendering: pixelated;"/>
       </div>
     </div>
-
     <div id="status-message"></div>
-
     <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Frame" style="margin-top: 1rem; width: min(50vmin, 280px); height: min(50vmin, 280px); image-rendering: pixelated; object-fit: contain; border-radius: 10px;" />
   </div>
-
   <div id="logs-container">
     <div id="status-bottom-left"></div>
     <div id="chat-messages"></div>
   </div>
-
   <div id="chat-wrapper">
     <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" />
   </div>
 
   <script>
+    let yourPos = {}, loverPos = null;
     const yourID = localStorage.getItem('yourID');
     const loverID = localStorage.getItem('loverID');
 
@@ -119,19 +129,27 @@
     document.getElementById('yourNameBox').textContent = yourID;
     document.getElementById('loverNameBox').textContent = loverID;
 
-    const yourAvatarImg = document.getElementById('your-avatar');
-    const loverAvatarImg = document.getElementById('lover-avatar');
+    document.getElementById('your-avatar').src = `images/avatars/${yourID}.png`;
+    document.getElementById('lover-avatar').src = `images/avatars/${loverID}.png`;
 
-    yourAvatarImg.src = `images/avatars/${yourID}.png`;
-    yourAvatarImg.onerror = () => { yourAvatarImg.src = 'images/avatars/default.png'; };
-
-    loverAvatarImg.src = `images/avatars/${loverID}.png`;
-    loverAvatarImg.onerror = () => { loverAvatarImg.src = 'images/avatars/default.png'; };
-
+    const loadingBar = document.getElementById('loading-bar');
+    const loadingContainer = document.getElementById('loading-bar-container');
     const statusMsg = document.getElementById('status-message');
-    const compassImg = document.getElementById('compass-img');
-    const totalFrames = 29;
-    let yourPos = {}, loverPos = null;
+
+    let loading = true;
+
+    function animateLoading() {
+      let width = 0;
+      function frame() {
+        if (!loading) return;
+        width = (width + 1) % 101;
+        loadingBar.style.width = width + '%';
+        requestAnimationFrame(frame);
+      }
+      frame();
+    }
+
+    animateLoading();
 
     function toRad(deg) { return deg * Math.PI / 180; }
     function getBearing(lat1, lon1, lat2, lon2) {
@@ -145,62 +163,37 @@
       const R = 3958.8;
       const dLat = toRad(lat2 - lat1);
       const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat/2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
     function getCardinalDirection(bearing) {
       const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
       return directions[Math.round(bearing / 45) % 8];
     }
-    function showNeedle(angle) {
-      if (angle == null || loverPos === null) {
-        compassImg.style.display = 'none';
-        return;
-      }
-      compassImg.style.display = 'block';
-      const frameIdx = Math.floor((angle / 360) * totalFrames) % totalFrames;
-      const padded = frameIdx.toString().padStart(2, '0');
-      compassImg.src = `images/needle-frames/frame_${padded}_delay-0.06s.png`;
-    }
+
     function updateCompass() {
       if (yourPos.lat && loverPos && loverPos.lat) {
+        loading = false;
+        loadingContainer.classList.remove('error');
         const brg = getBearing(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon);
         const dist = getDistanceMiles(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon).toFixed(1);
         const dir = getCardinalDirection(brg);
         const targetName = yourID === 'athloi' ? 'Serenitym16' : 'athloi';
-        showNeedle(brg);
+        document.getElementById('compass-img').style.display = 'block';
         statusMsg.textContent = `You are ${dist} miles ${dir} of ${targetName}`;
       } else {
-        showNeedle(null);
-        statusMsg.textContent = '';
+        document.getElementById('compass-img').style.display = 'none';
+        statusMsg.textContent = `Location of the other user is not available.`;
+        loading = false;
+        loadingContainer.classList.add('error');
       }
     }
 
-    // Simulate position updates (replace with Firebase + geolocation in production)
+    // Placeholder simulation for location
     navigator.geolocation.watchPosition(pos => {
       yourPos = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-      // Firebase set: db.ref('users/' + yourID).set(yourPos);
+      updateCompass();
     });
-    // Firebase listener (example)
-    // db.ref('users/' + loverID).on('value', snapshot => {
-    //   const data = snapshot.val();
-    //   if (data && data.lat && data.lon) {
-    //     loverPos = { lat: data.lat, lon: data.lon };
-    //     updateCompass();
-    //   }
-    // });
-
-    // Animate loading bar
-    const loadingBar = document.getElementById('loading-bar');
-    (function animateLoading() {
-      let width = 0;
-      function frame() {
-        width = (width + 1) % 101;
-        loadingBar.style.width = width + '%';
-        requestAnimationFrame(frame);
-      }
-      frame();
-    })();
   </script>
 </body>
 </html>
