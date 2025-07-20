@@ -14,36 +14,37 @@
 
     body {
       font-family: 'Press Start 2P', monospace;
-      margin: 0;
-      padding: 1rem;
+      margin: 0;            /* Remove default margin */
+      padding: 0.5rem 1rem 1rem 1rem; /* minimal top padding to not stick to browser edge */
       text-align: center;
       color: white;
       min-height: 100vh;
       background-color: var(--serenity-green);
       transition: background-color 0.5s ease;
+    
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-start; /* Align items starting from top */
     }
-
+    
     .info-panel {
       max-width: 400px;
-      margin: auto;
+      margin: 0 auto 1rem auto; /* top margin removed, only bottom margin */
       padding: 1rem;
       background: rgba(0,0,0,0.6);
       border: 3px solid white;
       border-radius: 10px;
-      margin-bottom: 1rem;
       line-height: 1.5;
     }
-
+    
     #lover-id-box-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-top: 0.5rem;
     }
-
+    
     #lover-id-box {
       max-width: 400px;
       font-family: 'Press Start 2P', monospace;
@@ -55,26 +56,29 @@
       box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
       margin-bottom: 0.5rem;
     }
-
-    /* Make compass and avatar same size, max reasonable size on page */
+    
+    /* Remove borders and background from compass and avatar */
     #compass-img,
     #lover-avatar {
       width: min(40vmin, 250px);
       height: min(40vmin, 250px);
       image-rendering: pixelated;
       object-fit: contain;
-      border: 3px solid white;
-      border-radius: 10px;
-      background: rgba(0,0,0,0.5);
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+    
+      /* Removed border, border-radius, background, box-shadow */
+      border: none !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    
       margin: 1rem auto 1rem auto;
       display: block;
     }
-
+    
     #compass-img {
       display: none;
     }
-
+    
     #lover-avatar {
       filter: drop-shadow(2px 2px 1px rgba(0,0,0,0.6));
     }
