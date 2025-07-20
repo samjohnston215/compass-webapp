@@ -348,20 +348,36 @@
     <div><strong>User:</strong> <span id="yourName"></span></div>
   </div>
 
-  <div id="avatars-row" style="display:flex; justify-content:space-around; align-items:center; width: 90vw; max-width: 600px; margin: 0 auto 1rem auto;">
-    <div class="avatar-block" style="text-align:center;">
-      <div class="avatar-name" id="yourNameBox" style="margin-bottom: 0.5rem; font-size: 14px; white-space: nowrap;"></div>
-      <img id="your-avatar" src="" alt="Your Avatar" style="width: 100px; height: 100px; border-radius: 10px; object-fit: contain; image-rendering: pixelated;"/>
+  <!-- Avatar row and loading bar centered above compass -->
+  <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; margin-bottom: 1rem;">
+    
+    <!-- Avatars and loading bar wrapper -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 90vw; max-width: 600px;">
+      
+      <!-- Your avatar -->
+      <div style="text-align: center; flex: 1;">
+        <div id="yourNameBox" style="margin-bottom: 0.5rem; font-size: 14px; white-space: nowrap;"></div>
+        <img id="your-avatar" src="" alt="Your Avatar" style="width: 90px; height: 90px; border-radius: 10px; image-rendering: pixelated;"/>
+      </div>
+
+      <!-- Loading bar in the middle -->
+      <div style="flex: 1; display: flex; justify-content: center;">
+        <div id="loading-bar-container" style="width: 100px; height: 16px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; position: relative; margin-bottom: 20px;">
+          <div id="loading-bar" style="background: var(--serenity-green); width: 0%; height: 100%; border-radius: 10px;"></div>
+        </div>
+      </div>
+
+      <!-- Lover avatar -->
+      <div style="text-align: center; flex: 1;">
+        <div id="loverNameBox" style="margin-bottom: 0.5rem; font-size: 14px; white-space: nowrap;"></div>
+        <img id="lover-avatar" src="" alt="Lover Avatar" style="width: 90px; height: 90px; border-radius: 10px; image-rendering: pixelated;"/>
+      </div>
+
     </div>
 
-    <div id="loading-bar-container" style="flex-grow:1; margin: 0 1rem; height: 20px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; position: relative;">
-      <div id="loading-bar" style="background: var(--serenity-green); width: 0%; height: 100%; border-radius: 10px;"></div>
-    </div>
+    <!-- Compass centered below -->
+    <img id="compass-img" src="" alt="Compass Frame" style="margin-top: 1rem; width: min(50vmin, 280px); height: min(50vmin, 280px); image-rendering: pixelated; object-fit: contain; border-radius: 10px;" />
 
-    <div class="avatar-block" style="text-align:center;">
-      <div class="avatar-name" id="loverNameBox" style="margin-bottom: 0.5rem; font-size: 14px; white-space: nowrap;"></div>
-      <img id="lover-avatar" src="" alt="Lover Avatar" style="width: 100px; height: 100px; border-radius: 10px; object-fit: contain; image-rendering: pixelated;"/>
-    </div>
   </div>
 
   <img id="compass-img" src="" alt="Compass Frame" style="display: block; margin: 0 auto 1rem auto; width: min(50vmin, 280px); height: min(50vmin, 280px); image-rendering: pixelated; object-fit: contain; border-radius: 10px;"/>
