@@ -1,10 +1,12 @@
+<!-- main.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <!-- Prevent zoom on mobile when typing -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Love Compass</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
   <style>
     :root {
       --serenity-green: #89a32e;
@@ -33,94 +35,9 @@
       padding: 1rem;
       border-radius: 10px;
       margin-bottom: 1rem;
-    }
-    #main-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
       max-width: 600px;
-      margin: 0 auto 1rem auto;
-    }
-    .top-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      margin-bottom: 1rem;
-      padding: 0 10px; /* added horizontal padding for breathing */
-    }
-    .avatar-side {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 85px; /* smaller width */
-      margin: 0 5px; /* reduce side margin */
-    }
-    .middle-loading {
-      display: flex;
-      justify-content: center;
-      flex-grow: 1;
-    }
-    .name-box {
-      margin-bottom: 0.5rem;
-      font-size: 14px;
-      white-space: nowrap;
-      max-width: 85px; /* ensure name fits */
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .avatar {
-      width: 90px;
-      height: 90px;
-      border-radius: 10px;
-      image-rendering: pixelated;
-    }
-    #loading-dots {
-      display: flex;
-      gap: 5px;
-      justify-content: center;
-      align-items: center;
-      height: 16px;
-    }
-    .loading-dot {
-      width: 12px;
-      height: 12px;
-      background: #333;
-      border: 2px solid #888;
-      box-shadow: inset 1px 1px 0 #000, inset -1px -1px 0 #444;
-      image-rendering: pixelated;
-    }
-    .loading-dot.on {
-      background: gold;
-    }
-    #distance-display {
-      margin: 10px 0 0 0;
-      font-size: 16px;
-      font-weight: bold;
-      color: var(--text-highlight);
-      user-select: none;
-      min-height: 24px;
-    }
-    #compass-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-    }
-    #compass-img {
-      margin-top: 1rem;
-      width: min(50vmin, 280px);
-      height: min(50vmin, 280px);
-      image-rendering: pixelated;
-      object-fit: contain;
-      border-radius: 10px;
-      transition: filter 0.3s ease;
-    }
-    #status-message {
-      margin-top: 1rem;
-      font-size: 14px;
-      color: var(--text-highlight);
+      width: 90vw;
+      box-sizing: border-box;
     }
     #logs-container {
       position: fixed;
@@ -136,6 +53,7 @@
       padding: 12px;
       font-size: 13px;
       line-height: 1.4;
+      box-sizing: border-box;
     }
     #chat-wrapper {
       position: fixed;
@@ -144,84 +62,187 @@
       transform: translateX(-50%);
       width: 90vw;
       max-width: 600px;
-      background: rgba(20, 20, 20, 0.6);
-      padding: 1rem;
-      border-radius: 10px 10px 0 0;
+      background: #3a5a1a; /* Minecraft grass/dirt inspired greenish */
+      padding: 8px 12px;
+      border-radius: 0; /* no rounding */
+      box-sizing: border-box;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-sizing: border-box;
+      filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.8));
+      image-rendering: pixelated;
+      font-family: var(--font-family);
+      background-image:
+        linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.15) 1px, transparent 1px);
+      background-size: 12px 12px;
+      z-index: 10;
     }
+    /* Remove rounded corners everywhere */
     input, textarea, button {
       border-radius: 0 !important;
     }
+    #chat-input {
+      flex-grow: 1;
+      padding: 10px 14px;
+      font-family: var(--font-family);
+      background: transparent; /* so container bg shows */
+      color: var(--text-light);
+      border: 2px solid #5a7d21; /* darker mossy green border */
+      font-size: 16px;
+      outline-offset: 2px;
+      user-select: text;
+      caret-color: gold;
+      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11; /* subtle pixel shading */
+      box-sizing: border-box;
+    }
     #clear-chat-btn {
-      background: transparent;
-      border: none;
+      background: #4e6f18; /* darker block green */
+      border: 2px solid #7eba37; /* bright pixel border */
       cursor: pointer;
       padding: 6px;
       color: var(--text-light);
       filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.7));
       font-size: 18px;
       user-select: none;
-      transition: color 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
       flex-shrink: 0;
       line-height: 1;
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11;
+      box-sizing: border-box;
     }
     #clear-chat-btn:hover {
-      color: #ff5555;
+      background: #7eba37;
+      color: #1a2600;
     }
-    #chat-input {
-      flex-grow: 1;
-      padding: 10px;
-      font-family: var(--font-family);
-      background: transparent;
+
+    /* Avatars and name containers */
+    .avatars-row {
+      display: flex;
+      justify-content: space-between;
+      width: 90vw;
+      max-width: 600px;
+      margin-bottom: 0.5rem;
+      box-sizing: border-box;
+    }
+    .avatar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      max-width: 120px;
+      gap: 4px;
+      user-select: none;
+    }
+    .name-box {
+      font-size: 14px;
+      white-space: nowrap;
+      max-width: 110px;
+      overflow: hidden;
+      text-overflow: ellipsis;
       color: var(--text-light);
-      border: 2px solid #888;
-      font-size: 16px;
-      outline-offset: 2px;
-      user-select: text;
+    }
+    img.avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 10px;
+      image-rendering: pixelated;
+      object-fit: contain;
+    }
+
+    /* Distance display */
+    #distance-display {
+      font-size: 14px;
+      margin: 0.8rem 0;
+      color: var(--text-highlight);
+      font-weight: bold;
+      user-select: none;
+      min-height: 20px;
+    }
+
+    /* Compass */
+    #compass-img {
+      width: min(50vmin, 280px);
+      height: min(50vmin, 280px);
+      image-rendering: pixelated;
+      object-fit: contain;
+      border-radius: 10px;
+      margin: 0 auto 2rem auto;
+      display: block;
+    }
+
+    /* Loading dots */
+    #loading-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 1rem;
+      user-select: none;
+    }
+    .loading-dot {
+      width: 18px;
+      height: 18px;
+      background: #7eba37; /* Minecraft green */
+      border: 2px solid #415e11;
+      box-shadow: inset 2px 2px 0 #a3d12f, inset -2px -2px 0 #2b3c08;
+      border-radius: 0;
+      image-rendering: pixelated;
+      animation-fill-mode: forwards;
+      opacity: 0.3;
+    }
+    .loading-dot.fill1 {
+      animation: fillDot 1.2s infinite;
+      animation-delay: 0s;
+    }
+    .loading-dot.fill2 {
+      animation: fillDot 1.2s infinite;
+      animation-delay: 0.4s;
+    }
+    .loading-dot.fill3 {
+      animation: fillDot 1.2s infinite;
+      animation-delay: 0.8s;
+    }
+    @keyframes fillDot {
+      0%, 100% { opacity: 0.3; background-color: #7eba37; }
+      50% { opacity: 1; background-color: #a3d12f; }
     }
   </style>
 </head>
 <body>
-  <div class="info-panel" role="region" aria-label="User information">
+  <div class="info-panel">
     <div><strong>User:</strong> <span id="yourName"></span></div>
   </div>
-  <div id="main-wrapper">
-    <div class="top-row">
-      <div class="avatar-side">
-        <div id="yourNameBox" class="name-box"></div>
-        <img id="your-avatar" class="avatar" src="" alt="Your Avatar" />
-      </div>
-      <div class="middle-loading">
-        <div id="loading-dots" aria-hidden="true" title="Loading...">
-          <div class="loading-dot" id="dot1"></div>
-          <div class="loading-dot" id="dot2"></div>
-          <div class="loading-dot" id="dot3"></div>
-        </div>
-      </div>
-      <div class="avatar-side">
-        <div id="loverNameBox" class="name-box"></div>
-        <img id="lover-avatar" class="avatar" src="" alt="Lover Avatar" />
-      </div>
+
+  <div class="avatars-row" aria-label="User avatars and names">
+    <div class="avatar-container" id="your-avatar-container">
+      <div class="name-box" id="yourNameBox"></div>
+      <img id="your-avatar" class="avatar" src="" alt="Your Avatar"/>
     </div>
-
-    <div id="distance-display" aria-live="polite" aria-atomic="true"></div>
-
-    <div id="compass-wrapper">
-      <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Needle" />
+    <div id="loading-dots" aria-label="Loading dots indicating status">
+      <div class="loading-dot fill1"></div>
+      <div class="loading-dot fill2"></div>
+      <div class="loading-dot fill3"></div>
+    </div>
+    <div class="avatar-container" id="lover-avatar-container">
+      <div class="name-box" id="loverNameBox"></div>
+      <img id="lover-avatar" class="avatar" src="" alt="Lover Avatar"/>
     </div>
   </div>
-  <div id="logs-container">
+
+  <div id="distance-display" aria-live="polite" aria-atomic="true"></div>
+
+  <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Needle" />
+
+  <div id="logs-container" aria-live="polite" aria-atomic="false">
     <div id="status-bottom-left"></div>
     <div id="chat-messages"></div>
   </div>
+
   <div id="chat-wrapper">
     <button id="clear-chat-btn" title="Clear Chat" aria-label="Clear Chat">🗑️</button>
     <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" />
@@ -264,15 +285,15 @@
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
     const statusBottomLeft = document.getElementById('status-bottom-left');
-    const statusMsg = document.getElementById('status-message');
+    const distanceDisplay = document.getElementById('distance-display');
     const compassImg = document.getElementById('compass-img');
     const clearChatBtn = document.getElementById('clear-chat-btn');
     const yourNameBox = document.getElementById('yourNameBox');
     const loverNameBox = document.getElementById('loverNameBox');
     const yourAvatarImg = document.getElementById('your-avatar');
     const loverAvatarImg = document.getElementById('lover-avatar');
-    const distanceDisplay = document.getElementById('distance-display');
 
+    // Sanitize function for chat messages
     function sanitize(text) {
       const div = document.createElement('div');
       div.textContent = text;
@@ -299,10 +320,12 @@
       }
     });
 
+    // Set your name and lover's name in the name boxes
     yourNameBox.textContent = yourID;
     loverNameBox.textContent = loverID;
     document.getElementById('yourName').textContent = yourID;
 
+    // Set avatar images with fallback
     yourAvatarImg.src = `images/avatars/${yourID}.png`;
     yourAvatarImg.onerror = () => {
       yourAvatarImg.src = 'images/avatars/default.png';
@@ -312,6 +335,7 @@
       loverAvatarImg.src = 'images/avatars/default.png';
     };
 
+    // Background color based on yourID
     function updateBackgroundColor(id) {
       if (id.toLowerCase() === 'serenitym16') {
         document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
@@ -323,6 +347,7 @@
     }
     updateBackgroundColor(yourID);
 
+    // Compass and distance logic
     function toRad(d) {
       return d * Math.PI / 180;
     }
@@ -335,7 +360,7 @@
       return (brg + 360) % 360;
     }
     function getDistanceMiles(lat1, lon1, lat2, lon2) {
-      const R = 3958.8;
+      const R = 3958.8; // Earth radius in miles
       const dLat = toRad(lat2 - lat1);
       const dLon = toRad(lon2 - lon1);
       const a = Math.sin(dLat/2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
@@ -371,14 +396,11 @@
         const dist = getDistanceMiles(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon).toFixed(1);
         const dir = getCardinalDirection(brg);
         showNeedle(brg);
-
-        const otherUser = yourID.toLowerCase() === 'athloi' ? 'Serenitym16' : 'athloi';
-
-        statusMsg.textContent = `You are ${dist} miles ${dir} of ${otherUser}`;
-        distanceDisplay.textContent = `You are ${dist} miles (${dir}) away from ${otherUser}`;
+        const targetName = yourID.toLowerCase() === 'athloi' ? 'Serenitym16' : 'athloi';
+        distanceDisplay.textContent = `You are ${dist} miles ${dir} of ${targetName}`;
+        statusBottomLeft.textContent = '';
       } else {
         showNeedle(null);
-        statusMsg.textContent = '';
         distanceDisplay.textContent = '';
       }
     }
@@ -399,20 +421,22 @@
         if (data && data.lat != null && data.lon != null) {
           loverPos = { lat: data.lat, lon: data.lon };
           updateCompass();
-          statusMsg.textContent = '';
           lastLoverUpdate = Date.now();
+          // loading dots visible and full opacity handled by CSS animation
         } else {
           loverPos = null;
           updateCompass();
-          statusMsg.textContent = `Waiting for ${loverID}'s location...`;
+          statusBottomLeft.textContent = `Waiting for ${loverID}'s location...`;
         }
       });
 
       setInterval(() => {
         if (!lastLoverUpdate || (Date.now() - lastLoverUpdate > 30000)) {
-          statusMsg.textContent = `${loverID}'s location is unavailable or outdated.`;
+          statusBottomLeft.textContent = `${loverID}'s location is unavailable or outdated.`;
           loverPos = null;
           updateCompass();
+        } else {
+          statusBottomLeft.textContent = '';
         }
       }, 5000);
     }
@@ -422,44 +446,28 @@
         startTracking();
       } else {
         const email = emailMap[yourID];
-        const password = passwordMap[yourID];
-
-        if (!email || !password) {
-          alert("Login config not found. Check index.html setup.");
-          return;
+        const pass = passwordMap[yourID];
+        if (email && pass) {
+          auth.signInWithEmailAndPassword(email, pass).catch(e => {
+            console.error('Auth failed:', e);
+            statusBottomLeft.textContent = 'Authentication failed. Please check your credentials.';
+          });
+        } else {
+          statusBottomLeft.textContent = 'No authentication credentials found.';
         }
-
-        auth.signInWithEmailAndPassword(email, password)
-          .then(() => startTracking())
-          .catch(err => alert("Auth failed: " + err.message));
       }
     });
 
-    db.ref('messages').limitToLast(50).on('child_added', (snapshot) => {
+    // Listen for new chat messages and display
+    db.ref('messages').on('child_added', snapshot => {
       const msg = snapshot.val();
-      const safeText = sanitize(msg.text);
-      const line = `<div><span style="color:gold">${sanitize(msg.sender)}</span>: ${safeText}</div>`;
-      chatMessages.insertAdjacentHTML('beforeend', line);
+      if (!msg) return;
+      const div = document.createElement('div');
+      div.innerHTML = `<strong>${sanitize(msg.sender)}</strong>: ${sanitize(msg.text)}`;
+      chatMessages.appendChild(div);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     });
 
-    if (!yourID || !loverID) {
-      alert("Missing ID info. Returning to start.");
-      window.location.href = 'index.html';
-    }
-
-    const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
-    let dotIndex = 0;
-    setInterval(() => {
-      dots.forEach((dot, idx) => {
-        dot.classList.toggle('on', idx === dotIndex);
-      });
-      dotIndex = (dotIndex + 1) % dots.length;
-    }, 500);
-
-    window.onload = () => {
-      chatInput.focus();
-    };
   </script>
 </body>
 </html>
