@@ -220,6 +220,17 @@
       0%, 100% { opacity: 0.3; background-color: #7eba37; }
       50% { opacity: 1; background-color: #a3d12f; }
     }
+    .chat-message {
+      background-color: rgba(34, 34, 34, 0.8); /* dark gray, slightly transparent */
+      border: none;                            /* no border */
+      padding: 6px 10px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 1.4;
+      user-select: text;
+    }
     @media (max-width: 350px) {
       .avatars-row {
         flex-wrap: wrap;
@@ -454,6 +465,8 @@
         const msg = childSnapshot.val();
         if (!msg) return;
         const msgDiv = document.createElement('div');
+        msgDiv.classList.add('chat-message');  // <-- add this line
+        
         const senderName = sanitize(msg.sender);
         const text = sanitize(msg.text);
         const color = senderName.toLowerCase() === yourID.toLowerCase() ? 'yellow' : 'yellow';
