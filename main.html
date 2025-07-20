@@ -35,10 +35,10 @@
     }
 
     #compass-img {
-      max-width: 90vmin;
+      max-width: 70vmin;
       height: auto;
       image-rendering: pixelated;
-      margin: 20px auto;
+      margin: 20px auto 10px auto;
       display: none;
     }
 
@@ -46,7 +46,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-top: 1rem;
+      margin-top: 0.5rem;
     }
 
     #lover-id-box {
@@ -55,16 +55,17 @@
       font-size: 16px;
       color: white;
       background: rgba(128,128,128,0.6);
-      padding: 8px 12px;
-      display: inline-block;
+      padding: 6px 10px;
       user-select: none;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
     }
 
     #lover-avatar {
-      margin-top: 0.5rem;
-      width: 64px;
-      height: 64px;
+      margin-top: 0.4rem;
+      width: 96px;
+      height: 96px;
       image-rendering: pixelated;
+      filter: drop-shadow(2px 2px 1px rgba(0,0,0,0.6));
     }
 
     #status-message {
@@ -95,7 +96,7 @@
 
     @media (max-width: 500px) {
       #compass-img {
-        max-width: 95vmin;
+        max-width: 85vmin;
       }
       #lover-id-box {
         font-size: 14px;
@@ -153,7 +154,12 @@
 
     document.getElementById('yourName').textContent = yourID;
     document.getElementById('lover-id-box').textContent = loverID;
-    document.getElementById('lover-avatar').src = `images/avatars/${loverID}.png`;
+
+    const avatarImg = document.getElementById('lover-avatar');
+    avatarImg.src = `images/avatars/${loverID}.png`;
+    avatarImg.onerror = () => {
+      avatarImg.src = 'images/avatars/default.png';
+    };
 
     function updateBackgroundColor(id) {
       if (id.toLowerCase() === 'serenitym16') {
@@ -167,7 +173,6 @@
     updateBackgroundColor(yourID);
 
     const statusBottomLeft = document.getElementById('status-bottom-left');
-    statusBottomLeft.innerHTML = `<span style="color:gold">${yourID}</span> is looking for <span style="color:gold">${loverID}</span>`;
 
     function toRad(d) {
       return d * Math.PI / 180;
@@ -180,6 +185,21 @@
                 Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
       const brg = Math.atan2(y, x) * 180 / Math.PI;
       return (brg + 360) % 360;
+    }
+
+    function getDistanceMiles(lat1, lon1, lat2, lon2) {
+      const R = 3958.8; // Earth radius in miles
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function getCardinalDirection(bearing) {
+      const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+      const idx = Math.round(bearing / 45) % 8;
+      return directions[idx];
     }
 
     const statusMsg = document.getElementById('status-message');
@@ -204,7 +224,10 @@
     function updateCompass() {
       if (yourPos.lat && loverPos && loverPos.lat) {
         const brg = getBearing(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon);
+        const dist = getDistanceMiles(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon).toFixed(1);
+        const dir = getCardinalDirection(brg);
         showNeedle(brg);
+        statusBottomLeft.innerHTML = `<span style="color:gold">${loverID}</span> is ${dist} miles ${dir} of <span style="color:gold">${yourID}</span>`;
       } else {
         showNeedle(null);
       }
