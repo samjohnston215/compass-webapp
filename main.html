@@ -422,7 +422,6 @@
           loverPos = { lat: data.lat, lon: data.lon };
           updateCompass();
           lastLoverUpdate = Date.now();
-          // loading dots visible and full opacity handled by CSS animation
         } else {
           loverPos = null;
           updateCompass();
@@ -446,9 +445,9 @@
         startTracking();
       } else {
         const email = emailMap[yourID];
-        const pass = passwordMap[yourID];
-        if (email && pass) {
-          auth.signInWithEmailAndPassword(email, pass).catch(e => {
+        const password = passwordMap[yourID];
+        if (email && password) {
+          auth.signInWithEmailAndPassword(email, password).catch(e => {
             console.error('Auth failed:', e);
             statusBottomLeft.textContent = 'Authentication failed. Please check your credentials.';
           });
@@ -463,11 +462,20 @@
       const msg = snapshot.val();
       if (!msg) return;
       const div = document.createElement('div');
-      div.innerHTML = `<strong>${sanitize(msg.sender)}</strong>: ${sanitize(msg.text)}`;
+      div.innerHTML = `<strong style="color: yellow;">${sanitize(msg.sender)}</strong>: ${sanitize(msg.text)}`;
       chatMessages.appendChild(div);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     });
 
+    if (!yourID || !loverID) {
+      alert("Missing ID info. Returning to start.");
+      window.location.href = 'index.html';
+    }
+
+    // Autofocus input on load
+    window.onload = () => {
+      chatInput.focus();
+    };
   </script>
 </body>
 </html>
