@@ -8,9 +8,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --serenity-green: #89a32e; /* Slightly darker green */
+      --serenity-green: #89a32e;
       --athloi-lavender: #B57EDC;
     }
+
     body {
       font-family: 'Press Start 2P', monospace;
       margin: 0;
@@ -38,20 +39,32 @@
       height: auto;
       image-rendering: pixelated;
       margin: 20px auto;
-      display: none; /* Hidden initially, shown when location ready */
+      display: none;
+    }
+
+    #lover-id-box-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 1rem;
     }
 
     #lover-id-box {
       max-width: 400px;
-      margin: 1rem auto 0 auto;
       font-family: 'Press Start 2P', monospace;
       font-size: 16px;
       color: white;
       background: rgba(128,128,128,0.6);
       padding: 8px 12px;
-      border-radius: 8px;
       display: inline-block;
       user-select: none;
+    }
+
+    #lover-avatar {
+      margin-top: 0.5rem;
+      width: 64px;
+      height: 64px;
+      image-rendering: pixelated;
     }
 
     #status-message {
@@ -63,15 +76,15 @@
 
     #status-bottom-left {
       position: fixed;
-      bottom: 20px; /* slightly higher */
+      bottom: 20px;
       left: 0;
       font-family: 'Press Start 2P', monospace;
       font-size: 12px;
       color: white;
-      background: rgba(40, 40, 40, 0.8); /* darker gray, slightly transparent */
+      background: rgba(40, 40, 40, 0.8);
       padding: 6px 12px;
       border: none;
-      border-radius: 0; /* no rounded corners */
+      border-radius: 0;
       user-select: none;
       z-index: 9999;
       max-width: 66vw;
@@ -97,7 +110,12 @@
   </div>
 
   <img id="compass-img" src="" alt="Compass Frame" />
-  <div id="lover-id-box"></div>
+
+  <div id="lover-id-box-wrapper">
+    <div id="lover-id-box"></div>
+    <img id="lover-avatar" src="" alt="Lover Avatar" />
+  </div>
+
   <div id="status-message"></div>
   <div id="status-bottom-left"></div>
 
@@ -135,8 +153,8 @@
 
     document.getElementById('yourName').textContent = yourID;
     document.getElementById('lover-id-box').textContent = loverID;
+    document.getElementById('lover-avatar').src = `images/avatars/${loverID}.png`;
 
-    // Update background color based on yourID
     function updateBackgroundColor(id) {
       if (id.toLowerCase() === 'serenitym16') {
         document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
@@ -148,13 +166,13 @@
     }
     updateBackgroundColor(yourID);
 
-    // Minecraft chat style status bottom left
     const statusBottomLeft = document.getElementById('status-bottom-left');
     statusBottomLeft.innerHTML = `<span style="color:gold">${yourID}</span> is looking for <span style="color:gold">${loverID}</span>`;
 
     function toRad(d) {
       return d * Math.PI / 180;
     }
+
     function getBearing(lat1, lon1, lat2, lon2) {
       const dLon = toRad(lon2 - lon1);
       const y = Math.sin(dLon) * Math.cos(toRad(lat2));
@@ -208,7 +226,7 @@
         if (data && data.lat != null && data.lon != null) {
           loverPos = { lat: data.lat, lon: data.lon };
           updateCompass();
-          statusMsg.textContent = '';  // Clear status message on valid data
+          statusMsg.textContent = '';
           lastLoverUpdate = Date.now();
         } else {
           loverPos = null;
@@ -217,7 +235,6 @@
         }
       });
 
-      // Periodic check for stale data
       setInterval(() => {
         if (!lastLoverUpdate || (Date.now() - lastLoverUpdate > 30000)) {
           statusMsg.textContent = `${loverID}'s location is unavailable or outdated.`;
@@ -227,7 +244,6 @@
       }, 5000);
     }
 
-    // Firebase Authentication and Start Tracking
     auth.onAuthStateChanged(user => {
       if (user) {
         startTracking();
@@ -246,7 +262,6 @@
       }
     });
 
-    // Redirect if missing info
     if (!yourID || !loverID) {
       alert("Missing ID info. Returning to start.");
       window.location.href = 'index.html';
