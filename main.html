@@ -79,11 +79,11 @@
       width: 90vw;
       max-width: 600px;
       max-height: 35vh;
-      overflow-y: auto;
-      background: #222;              /* solid dark gray */
-      border: 1.5px solid white;    /* white border */
-      border-radius: 8px;
-      padding: 12px;
+      overflow-y: hidden; /* hide scroll here, let chat-messages handle it */
+      background: transparent; /* remove solid bg */
+      border: none;            /* remove border */
+      border-radius: 0;        /* squared corners */
+      padding: 0;              /* no padding here */
       box-sizing: border-box;
     }
 
