@@ -47,10 +47,8 @@
       background: var(--bg-lighter);
       border-radius: 8px;
       padding: 12px;
-      font-size: 12px;
-      line-height: 1.5; /* Slightly increased line spacing */
-      text-align: left;
-      user-select: text;
+      font-size: 13px;
+      line-height: 1.4; /* Slightly increased line spacing */
     }
     #chat-wrapper {
       position: fixed;
@@ -59,49 +57,63 @@
       transform: translateX(-50%);
       width: 90vw;
       max-width: 600px;
-      background: #141414;  /* Solid background, no transparency */
+      background: rgba(20, 20, 20, 0.6);
       padding: 1rem;
-      border-radius: 0; /* No rounded corners */
-      box-sizing: border-box;
-      user-select: none;
+      border-radius: 10px 10px 0 0;
       display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+      align-items: center;
+      gap: 8px;
+      box-sizing: border-box;
     }
+    /* Clear chat button with trash icon */
     #clear-chat-btn {
-      font-family: var(--font-family);
-      background: #222;
-      color: var(--text-light);
+      background: transparent;
       border: none;
-      padding: 6px 10px;
       cursor: pointer;
+      padding: 6px;
+      color: var(--text-light);
+      filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.7));
+      font-size: 18px;
       user-select: none;
-      width: 100%;
-      border-radius: 4px;
-      transition: background 0.3s ease;
-      flex-shrink: 0;
+      transition: color 0.3s ease;
     }
     #clear-chat-btn:hover {
-      background: #444;
+      color: #ff5555;
     }
     #chat-input {
-      width: 100%;
+      flex-grow: 1;
       padding: 10px;
-      font-size: 16px;
       font-family: var(--font-family);
-      background: #222; /* Solid background */
+      background: transparent; /* Removed background */
       color: var(--text-light);
       border: 2px solid #888;
-      border-radius: 4px; /* You can change to 0 if you want squared */
+      border-radius: 0; /* No rounded corners */
+      font-size: 16px; /* Prevent zoom on mobile */
       outline-offset: 2px;
       user-select: text;
-      box-sizing: border-box;
-      flex-grow: 1;
     }
     #status-message {
       margin-top: 1rem;
       font-size: 14px;
       color: var(--text-highlight);
+    }
+    #loading-bar-container {
+      width: 100px;
+      height: 16px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 20px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #loading-bar {
+      background: white;
+      width: 0%;
+      height: 100%;
+      border-radius: 10px;
+      transition: width 0.1s linear;
     }
   </style>
 </head>
@@ -116,17 +128,8 @@
         <img id="your-avatar" src="" alt="Your Avatar" style="width: 90px; height: 90px; border-radius: 10px; image-rendering: pixelated;"/>
       </div>
       <div style="flex: 1; display: flex; justify-content: center;">
-        <div id="loading-bar-container" style="width: 100px; height: 16px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; position: relative; margin-bottom: 20px;">
-          <div id="loading-bar" style="background: #fff; width: 0%; height: 100%; border-radius: 10px;"></div>
-          <div id="loading-bar-x" style="display:none; 
-            position: absolute; 
-            top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events:none;
-            background: rgba(255,0,0,0.2);
-            mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><line x1="4" y1="4" x2="20" y2="20" stroke="red" stroke-width="3"/><line x1="20" y1="4" x2="4" y2="20" stroke="red" stroke-width="3"/></svg>');
-            mask-repeat: no-repeat;
-            mask-position: center;
-          "></div>
+        <div id="loading-bar-container">
+          <div id="loading-bar"></div>
         </div>
       </div>
       <div style="text-align: center; flex: 1;">
@@ -142,10 +145,12 @@
     <div id="chat-messages"></div>
   </div>
   <div id="chat-wrapper">
-    <button id="clear-chat-btn">Clear Chat</button>
+    <button id="clear-chat-btn" title="Clear Chat" aria-label="Clear Chat">
+      <!-- Trash can icon from Unicode -->
+      🗑️
+    </button>
     <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" />
   </div>
-
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -184,40 +189,9 @@
     const chatMessages = document.getElementById('chat-messages');
     const statusBottomLeft = document.getElementById('status-bottom-left');
     const statusMsg = document.getElementById('status-message');
+    const compassImg = document.getElementById('compass-img');
     const loadingBar = document.getElementById('loading-bar');
-    const loadingBarX = document.getElementById('loading-bar-x');
     const clearChatBtn = document.getElementById('clear-chat-btn');
-
-    // Set your name and lover's name
-    document.getElementById('yourNameBox').textContent = yourID || '';
-    document.getElementById('loverNameBox').textContent = loverID || '';
-    document.getElementById('yourName').textContent = yourID || '';
-
-    // Set your avatar image with fallback
-    const yourAvatarImg = document.getElementById('your-avatar');
-    yourAvatarImg.src = `images/avatars/${yourID}.png`;
-    yourAvatarImg.onerror = () => {
-      yourAvatarImg.src = 'images/avatars/default.png';
-    };
-
-    // Set lover avatar image with fallback
-    const loverAvatarImg = document.getElementById('lover-avatar');
-    loverAvatarImg.src = `images/avatars/${loverID}.png`;
-    loverAvatarImg.onerror = () => {
-      loverAvatarImg.src = 'images/avatars/default.png';
-    };
-
-    // Background color by user
-    function updateBackgroundColor(id) {
-      if (id && id.toLowerCase() === 'serenitym16') {
-        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
-      } else if (id && id.toLowerCase() === 'athloi') {
-        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--athloi-lavender');
-      } else {
-        document.body.style.backgroundColor = '#1d1d1d';
-      }
-    }
-    updateBackgroundColor(yourID);
 
     // Sanitize function for chat messages
     function sanitize(text) {
@@ -226,7 +200,6 @@
       return div.innerHTML;
     }
 
-    // Chat send handler
     chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && chatInput.value.trim() !== '') {
         const message = {
@@ -240,28 +213,43 @@
       }
     });
 
-    // Listen for new chat messages and add to chat-messages container
-    db.ref('messages').limitToLast(50).on('child_added', (snapshot) => {
-      const msg = snapshot.val();
-      const safeText = sanitize(msg.text);
-      const safeSender = sanitize(msg.sender);
-      const line = `<div><span style="color:gold">${safeSender}</span>: ${safeText}</div>`;
-      chatMessages.insertAdjacentHTML('beforeend', line);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    });
-
-    // Clear chat button handler
     clearChatBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to clear all chat messages?')) {
-        db.ref('messages').remove()
-          .then(() => {
-            chatMessages.innerHTML = '';
-          })
-          .catch(err => alert('Error clearing chat: ' + err.message));
-      }
+      // Remove all messages in DB under 'messages'
+      db.ref('messages').remove();
+      // Clear local chat messages display
+      chatMessages.innerHTML = '';
     });
 
-    // Location & compass logic
+    // Set your name and lover's name in the name boxes
+    document.getElementById('yourNameBox').textContent = yourID;
+    document.getElementById('loverNameBox').textContent = loverID;
+    document.getElementById('yourName').textContent = yourID;
+
+    // Set avatar images with fallback
+    const yourAvatarImg = document.getElementById('your-avatar');
+    yourAvatarImg.src = `images/avatars/${yourID}.png`;
+    yourAvatarImg.onerror = () => {
+      yourAvatarImg.src = 'images/avatars/default.png';
+    };
+    const loverAvatarImg = document.getElementById('lover-avatar');
+    loverAvatarImg.src = `images/avatars/${loverID}.png`;
+    loverAvatarImg.onerror = () => {
+      loverAvatarImg.src = 'images/avatars/default.png';
+    };
+
+    // Background color based on yourID
+    function updateBackgroundColor(id) {
+      if (id.toLowerCase() === 'serenitym16') {
+        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
+      } else if (id.toLowerCase() === 'athloi') {
+        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--athloi-lavender');
+      } else {
+        document.body.style.backgroundColor = '#1d1d1d';
+      }
+    }
+    updateBackgroundColor(yourID);
+
+    // Compass and distance logic
     function toRad(d) {
       return d * Math.PI / 180;
     }
@@ -287,7 +275,6 @@
       return directions[idx];
     }
 
-    const compassImg = document.getElementById('compass-img');
     const totalFrames = 29;
 
     let yourPos = {}, loverPos = null;
@@ -311,9 +298,8 @@
         const dist = getDistanceMiles(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon).toFixed(1);
         const dir = getCardinalDirection(brg);
         showNeedle(brg);
-        const targetName = yourID === 'athloi' ? 'Serenitym16' : 'athloi';
+        const targetName = yourID.toLowerCase() === 'athloi' ? 'Serenitym16' : 'athloi';
         statusMsg.textContent = `You are ${dist} miles ${dir} of ${targetName}`;
-        loadingBarX.style.display = 'none';
       } else {
         showNeedle(null);
         statusMsg.textContent = '';
@@ -336,9 +322,10 @@
         if (data && data.lat != null && data.lon != null) {
           loverPos = { lat: data.lat, lon: data.lon };
           updateCompass();
+          statusMsg.textContent = '';
           lastLoverUpdate = Date.now();
-          loadingBarX.style.display = 'none';
-          if (!loadingAnimationRunning) animateLoadingBar();
+          // Remove red X if any
+          loadingBar.style.filter = '';
         } else {
           loverPos = null;
           updateCompass();
@@ -351,32 +338,15 @@
           statusMsg.textContent = `${loverID}'s location is unavailable or outdated.`;
           loverPos = null;
           updateCompass();
-          // Show red X on loading bar and stop animation
-          loadingBarX.style.display = 'block';
-          cancelAnimationFrame(loadingAnimationFrameId);
-          loadingAnimationRunning = false;
-          loadingBar.style.width = '100%'; // keep full bar but with X
+          // Show red X on loading bar
+          loadingBar.style.filter = 'drop-shadow(0 0 0 red) drop-shadow(0 0 0 red)';
+          loadingBar.style.backgroundColor = '#ff4444';
+        } else {
+          // Remove red X and restore white background if previously set
+          loadingBar.style.filter = '';
+          loadingBar.style.backgroundColor = 'white';
         }
-      }, 3000); // check every 3 seconds
-    }
-
-    let loadingAnimationFrameId;
-    let loadingAnimationRunning = false;
-
-    function animateLoadingBar() {
-      loadingAnimationRunning = true;
-      let width = 0;
-
-      function frame() {
-        width += 2;
-        if (width > 100) {
-          width = 0; // reset instantly to 0%
-        }
-        loadingBar.style.width = width + '%';
-        loadingBar.style.backgroundColor = '#fff';
-        loadingAnimationFrameId = requestAnimationFrame(frame);
-      }
-      frame();
+      }, 5000);
     }
 
     auth.onAuthStateChanged(user => {
@@ -397,18 +367,34 @@
       }
     });
 
+    // Listen for new chat messages and add to chat-messages container
+    db.ref('messages').limitToLast(50).on('child_added', (snapshot) => {
+      const msg = snapshot.val();
+      const safeText = sanitize(msg.text);
+      const line = `<div><span style="color:gold">${sanitize(msg.sender)}</span>: ${safeText}</div>`;
+      chatMessages.insertAdjacentHTML('beforeend', line);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+
     if (!yourID || !loverID) {
       alert("Missing ID info. Returning to start.");
       window.location.href = 'index.html';
     }
 
+    // Loading bar animation: fill from left to right then reset
+    let loadingWidth = 0;
+    function animateLoadingBar() {
+      loadingWidth += 2; // speed of fill
+      if (loadingWidth > 100) loadingWidth = 0;
+      loadingBar.style.width = loadingWidth + '%';
+      requestAnimationFrame(animateLoadingBar);
+    }
+    animateLoadingBar();
+
     // Autofocus input on load
     window.onload = () => {
       chatInput.focus();
     };
-
-    // Start the loading bar animation initially
-    animateLoadingBar();
   </script>
 </body>
 </html>
