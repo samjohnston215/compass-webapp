@@ -64,39 +64,35 @@
       transform: translateX(-50%);
       width: 90vw;
       max-width: 600px;
-      background: #3a5a1a;
-      padding: 8px 12px;
-      border-radius: 0;
+      background: #222;             /* Dark gray solid */
+      border: 1.5px solid white;   /* White border */
+      padding: 6px 10px;           /* Slightly smaller padding */
       box-sizing: border-box;
       display: flex;
       align-items: center;
       gap: 8px;
       filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.8));
-      image-rendering: pixelated;
       font-family: var(--font-family);
-      background-image:
-        linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0,0,0,0.15) 1px, transparent 1px);
+      image-rendering: pixelated;
       z-index: 10;
-    }
-    input, textarea, button {
-      border-radius: 0 !important;
     }
 
     /* Input box with white border and Minecraft style */
     #chat-input {
       flex-grow: 1;
-      padding: 10px 14px;
+      padding: 6px 10px;           /* Reduced padding to make box smaller */
       font-family: var(--font-family);
       background: transparent;
       color: var(--text-light);
-      border: 1.5px solid white;    /* white border */
-      font-size: 16px;
+      border: 1.5px solid white;
+      font-size: 14px;             /* Slightly smaller font size */
       outline-offset: 2px;
       user-select: text;
       caret-color: gold;
       box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11;
       box-sizing: border-box;
+      height: 28px;                /* Fixed smaller height */
+      line-height: 1.2;
     }
 
     /* Clear chat button with white border and Minecraft style */
