@@ -34,14 +34,6 @@
       line-height: 1.5;
     }
 
-    #compass-img {
-      max-width: 70vmin;
-      height: auto;
-      image-rendering: pixelated;
-      margin: 20px auto 10px auto;
-      display: none;
-    }
-
     #lover-id-box-wrapper {
       display: flex;
       flex-direction: column;
@@ -60,11 +52,21 @@
       box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
     }
 
+    /* Shared compass/avatar style */
+    #compass-img,
     #lover-avatar {
-      margin-top: 0.4rem;
       width: 96px;
       height: 96px;
       image-rendering: pixelated;
+    }
+
+    #compass-img {
+      margin: 20px auto 10px auto;
+      display: none;
+    }
+
+    #lover-avatar {
+      margin-top: 0.4rem;
       filter: drop-shadow(2px 2px 1px rgba(0,0,0,0.6));
     }
 
@@ -95,9 +97,6 @@
     }
 
     @media (max-width: 500px) {
-      #compass-img {
-        max-width: 85vmin;
-      }
       #lover-id-box {
         font-size: 14px;
         max-width: 90vw;
