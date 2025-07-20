@@ -48,12 +48,14 @@
       align-items: center;
       width: 100%;
       margin-bottom: 1rem;
+      padding: 0 10px; /* added horizontal padding for breathing */
     }
     .avatar-side {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 100px;
+      width: 85px; /* smaller width */
+      margin: 0 5px; /* reduce side margin */
     }
     .middle-loading {
       display: flex;
@@ -64,6 +66,9 @@
       margin-bottom: 0.5rem;
       font-size: 14px;
       white-space: nowrap;
+      max-width: 85px; /* ensure name fits */
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .avatar {
       width: 90px;
@@ -207,7 +212,6 @@
       </div>
     </div>
 
-    <!-- New distance display -->
     <div id="distance-display" aria-live="polite" aria-atomic="true"></div>
 
     <div id="compass-wrapper">
@@ -269,7 +273,6 @@
     const loverAvatarImg = document.getElementById('lover-avatar');
     const distanceDisplay = document.getElementById('distance-display');
 
-    // Sanitize function for chat messages
     function sanitize(text) {
       const div = document.createElement('div');
       div.textContent = text;
@@ -296,12 +299,10 @@
       }
     });
 
-    // Set your name and lover's name in the name boxes
     yourNameBox.textContent = yourID;
     loverNameBox.textContent = loverID;
     document.getElementById('yourName').textContent = yourID;
 
-    // Set avatar images with fallback
     yourAvatarImg.src = `images/avatars/${yourID}.png`;
     yourAvatarImg.onerror = () => {
       yourAvatarImg.src = 'images/avatars/default.png';
@@ -311,7 +312,6 @@
       loverAvatarImg.src = 'images/avatars/default.png';
     };
 
-    // Background color based on yourID
     function updateBackgroundColor(id) {
       if (id.toLowerCase() === 'serenitym16') {
         document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
@@ -323,7 +323,6 @@
     }
     updateBackgroundColor(yourID);
 
-    // Compass and distance logic
     function toRad(d) {
       return d * Math.PI / 180;
     }
@@ -336,7 +335,7 @@
       return (brg + 360) % 360;
     }
     function getDistanceMiles(lat1, lon1, lat2, lon2) {
-      const R = 3958.8; // Earth radius in miles
+      const R = 3958.8;
       const dLat = toRad(lat2 - lat1);
       const dLon = toRad(lon2 - lon1);
       const a = Math.sin(dLat/2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
@@ -373,12 +372,9 @@
         const dir = getCardinalDirection(brg);
         showNeedle(brg);
 
-        // Determine other user's name for the message
         const otherUser = yourID.toLowerCase() === 'athloi' ? 'Serenitym16' : 'athloi';
 
         statusMsg.textContent = `You are ${dist} miles ${dir} of ${otherUser}`;
-
-        // Update the new distance display as requested
         distanceDisplay.textContent = `You are ${dist} miles (${dir}) away from ${otherUser}`;
       } else {
         showNeedle(null);
@@ -439,7 +435,6 @@
       }
     });
 
-    // Listen for new chat messages and add to chat-messages container
     db.ref('messages').limitToLast(50).on('child_added', (snapshot) => {
       const msg = snapshot.val();
       const safeText = sanitize(msg.text);
@@ -453,7 +448,6 @@
       window.location.href = 'index.html';
     }
 
-    // Animate loading dots
     const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
     let dotIndex = 0;
     setInterval(() => {
@@ -463,7 +457,6 @@
       dotIndex = (dotIndex + 1) % dots.length;
     }, 500);
 
-    // Autofocus input on load
     window.onload = () => {
       chatInput.focus();
     };
