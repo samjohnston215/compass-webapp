@@ -38,7 +38,33 @@
       box-sizing: border-box;
     }
 
-    /* Chat messages container with solid dark gray bg and white border */
+    /* Chat messages container: remove bg and border so chat messages' bg is visible */
+    #chat-messages {
+      background: transparent !important;
+      border: none !important;
+      padding: 0;
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.4;
+      max-height: 100%;
+      overflow-y: auto;
+    }
+
+    /* Individual sent chat messages */
+    .chat-message {
+      background-color: rgba(34, 34, 34, 0.8) !important; /* dark gray, transparent */
+      border: none !important;
+      padding: 6px 10px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      word-break: break-word;
+      user-select: text;
+      font-family: var(--font-family);
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--text-light);
+    }
+
     #logs-container {
       position: fixed;
       bottom: 70px;
@@ -52,8 +78,6 @@
       border: 1.5px solid white;    /* white border */
       border-radius: 8px;
       padding: 12px;
-      font-size: 13px;
-      line-height: 1.4;
       box-sizing: border-box;
     }
 
@@ -219,17 +243,6 @@
     @keyframes fillDot {
       0%, 100% { opacity: 0.3; background-color: #7eba37; }
       50% { opacity: 1; background-color: #a3d12f; }
-    }
-    .chat-message {
-      background-color: rgba(34, 34, 34, 0.8); /* dark gray, slightly transparent */
-      border: none;                            /* no border */
-      padding: 6px 10px;
-      margin-bottom: 6px;
-      border-radius: 6px;
-      word-break: break-word;
-      font-size: 13px;
-      line-height: 1.4;
-      user-select: text;
     }
     @media (max-width: 350px) {
       .avatars-row {
@@ -465,8 +478,7 @@
         const msg = childSnapshot.val();
         if (!msg) return;
         const msgDiv = document.createElement('div');
-        msgDiv.classList.add('chat-message');  // <-- add this line
-        
+        msgDiv.classList.add('chat-message');  // <-- Add this class for styling
         const senderName = sanitize(msg.sender);
         const text = sanitize(msg.text);
         const color = senderName.toLowerCase() === yourID.toLowerCase() ? 'yellow' : 'yellow';
