@@ -124,40 +124,91 @@
       width: 0%;
       height: 100%;
       border-radius: 10px;
-      transition: width 0.1s linear;
+      transition: width 0.1s linear, background-color 0.5s ease;
+    }
+    #compass-img {
+      margin-top: 1rem;
+      width: min(50vmin, 280px);
+      height: min(50vmin, 280px);
+      image-rendering: pixelated;
+      object-fit: contain;
+      border-radius: 10px;
+      transition: filter 0.3s ease;
+    }
+
+    /* Layout classes to replace inline styles */
+    .flex-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      width: 90vw;
+      max-width: 600px;
+    }
+    .flex-center {
+      display: flex;
+      justify-content: center;
+      flex: 1;
+    }
+    .flex-column-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 1rem;
+    }
+    .name-box {
+      margin-bottom: 0.5rem;
+      font-size: 14px;
+      white-space: nowrap;
+      text-align: center;
+    }
+    img.avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 10px;
+      image-rendering: pixelated;
+    }
+
+    /* Chat message timestamp styling */
+    .chat-timestamp {
+      font-size: 10px;
+      color: #bbb;
+      margin-left: 8px;
+      user-select: none;
     }
   </style>
 </head>
 <body>
-  <div class="info-panel">
+  <div class="info-panel" role="region" aria-label="User information">
     <div><strong>User:</strong> <span id="yourName"></span></div>
   </div>
-  <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; margin-bottom: 1rem;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 90vw; max-width: 600px;">
-      <div style="text-align: center; flex: 1;">
-        <div id="yourNameBox" style="margin-bottom: 0.5rem; font-size: 14px; white-space: nowrap;"></div>
-        <img id="your-avatar" src="" alt="Your Avatar" style="width: 90px; height: 90px; border-radius: 10px; image-rendering: pixelated;"/>
+  <div class="flex-column-center">
+    <div class="flex-row" role="region" aria-label="User and lover info">
+      <div style="flex:1; text-align:center;">
+        <div id="yourNameBox" class="name-box"></div>
+        <img id="your-avatar" class="avatar" src="" alt="Your Avatar" />
       </div>
-      <div style="flex: 1; display: flex; justify-content: center;">
-        <div id="loading-bar-container">
+      <div class="flex-center">
+        <div id="loading-bar-container" aria-hidden="true">
           <div id="loading-bar"></div>
         </div>
       </div>
-      <div style="text-align: center; flex: 1;">
-        <div id="loverNameBox" style="margin-bottom: 0.5rem; font-size: 14px; white-space: nowrap;"></div>
-        <img id="lover-avatar" src="" alt="Lover Avatar" style="width: 90px; height: 90px; border-radius: 10px; image-rendering: pixelated;"/>
+      <div style="flex:1; text-align:center;">
+        <div id="loverNameBox" class="name-box"></div>
+        <img id="lover-avatar" class="avatar" src="" alt="Lover Avatar" />
       </div>
     </div>
-    <div id="status-message"></div>
-    <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Frame" style="margin-top: 1rem; width: min(50vmin, 280px); height: min(50vmin, 280px); image-rendering: pixelated; object-fit: contain; border-radius: 10px;" />
+    <div id="status-message" role="status" aria-live="polite"></div>
+    <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Needle" />
   </div>
-  <div id="logs-container">
+  <div id="logs-container" role="log" aria-live="polite" aria-relevant="additions" aria-atomic="false">
     <div id="status-bottom-left"></div>
     <div id="chat-messages"></div>
   </div>
   <div id="chat-wrapper">
     <button id="clear-chat-btn" title="Clear Chat" aria-label="Clear Chat">🗑️</button>
-    <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" />
+    <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" maxlength="200" />
   </div>
 
   <!-- Firebase SDKs -->
@@ -209,6 +260,15 @@
       return div.innerHTML;
     }
 
+    // Format timestamp to HH:MM 24h format
+    function formatTimestamp(ts) {
+      const date = new Date(ts);
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    }
+
+    // Handle sending chat message
     chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && chatInput.value.trim() !== '') {
         const message = {
@@ -298,7 +358,12 @@
       const frameIdx = Math.floor((angle / 360) * totalFrames) % totalFrames;
       const padded = frameIdx.toString().padStart(2, '0');
       const imgURL = `images/needle-frames/frame_${padded}_delay-0.06s.png`;
-      compassImg.src = imgURL;
+      // Adding fade effect for smoother transition
+      compassImg.style.filter = 'blur(2px)';
+      setTimeout(() => {
+        compassImg.src = imgURL;
+        compassImg.style.filter = 'blur(0)';
+      }, 100);
     }
 
     function updateCompass() {
@@ -315,13 +380,26 @@
       }
     }
 
+    // Debounce function for location update (limit updates to once every 2 seconds)
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    let debouncedSetYourPos = debounce(pos => {
+      db.ref('users/' + yourID).set(pos);
+    }, 2000);
+
     function startTracking() {
       navigator.geolocation.watchPosition(pos => {
         yourPos = {
           lat: pos.coords.latitude,
           lon: pos.coords.longitude
         };
-        db.ref('users/' + yourID).set(yourPos);
+        debouncedSetYourPos(yourPos);
       }, () => alert('Location permission denied'), {
         enableHighAccuracy: true
       });
@@ -353,7 +431,7 @@
       }, 5000);
     }
 
-    auth.onAuthStateChanged(user => {
+    auth.onAuthStateChanged(async (user) => {
       if (user) {
         startTracking();
       } else {
@@ -365,9 +443,12 @@
           return;
         }
 
-        auth.signInWithEmailAndPassword(email, password)
-          .then(() => startTracking())
-          .catch(err => alert("Auth failed: " + err.message));
+        try {
+          await auth.signInWithEmailAndPassword(email, password);
+          startTracking();
+        } catch (err) {
+          alert("Auth failed: " + err.message);
+        }
       }
     });
 
@@ -375,9 +456,19 @@
     db.ref('messages').limitToLast(50).on('child_added', (snapshot) => {
       const msg = snapshot.val();
       const safeText = sanitize(msg.text);
-      const line = `<div><span style="color:gold">${sanitize(msg.sender)}</span>: ${safeText}</div>`;
+      const time = msg.timestamp ? formatTimestamp(msg.timestamp) : '';
+      const line = `
+        <div>
+          <span style="color:gold">${sanitize(msg.sender)}</span>: ${safeText}
+          <span class="chat-timestamp">${time}</span>
+        </div>`;
       chatMessages.insertAdjacentHTML('beforeend', line);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // Scroll only if near bottom to avoid disrupting user reading old messages
+      const threshold = 50; // px
+      if (chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < threshold) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
     });
 
     if (!yourID || !loverID) {
