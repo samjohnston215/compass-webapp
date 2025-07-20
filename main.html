@@ -115,9 +115,11 @@
     #logs-container {
       position: fixed;
       bottom: 70px; /* leave room for chat input */
-      left: 0;
-      max-width: 66vw;
-      max-height: 30vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      max-width: 600px;
+      max-height: 35vh;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -164,15 +166,16 @@
     #chat-wrapper {
       position: fixed;
       bottom: 0;
-      left: 0;
-      width: 44.4%; /* 4/9ths */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      max-width: 600px;
       text-align: center;
-      padding: 0.5rem;
+      padding: 0.75rem 1rem;
       background: rgba(20, 20, 20, 0.6);
       box-shadow: 0 -3px 5px rgba(0,0,0,0.7);
       z-index: 10000;
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
+      border-radius: 10px 10px 0 0;
       user-select: none;
       box-sizing: border-box;
     }
@@ -345,12 +348,23 @@
     <div><strong>User:</strong> <span id="yourName"></span></div>
   </div>
 
-  <img id="compass-img" src="" alt="Compass Frame" />
+  <div id="avatars-row" style="display:flex; justify-content:space-around; align-items:center; width: 90vw; max-width: 600px; margin: 0 auto 1rem auto;">
+    <div class="avatar-block" style="text-align:center;">
+      <div class="avatar-name" id="yourNameBox" style="margin-bottom: 0.5rem; font-size: 14px; white-space: nowrap;"></div>
+      <img id="your-avatar" src="" alt="Your Avatar" style="width: 100px; height: 100px; border-radius: 10px; object-fit: contain; image-rendering: pixelated;"/>
+    </div>
 
-  <div id="lover-id-box-wrapper">
-    <div id="lover-id-box"></div>
-    <img id="lover-avatar" src="" alt="Lover Avatar" />
+    <div id="loading-bar-container" style="flex-grow:1; margin: 0 1rem; height: 20px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; position: relative;">
+      <div id="loading-bar" style="background: var(--serenity-green); width: 0%; height: 100%; border-radius: 10px;"></div>
+    </div>
+
+    <div class="avatar-block" style="text-align:center;">
+      <div class="avatar-name" id="loverNameBox" style="margin-bottom: 0.5rem; font-size: 14px; white-space: nowrap;"></div>
+      <img id="lover-avatar" src="" alt="Lover Avatar" style="width: 100px; height: 100px; border-radius: 10px; object-fit: contain; image-rendering: pixelated;"/>
+    </div>
   </div>
+
+  <img id="compass-img" src="" alt="Compass Frame" style="display: block; margin: 0 auto 1rem auto; width: min(50vmin, 280px); height: min(50vmin, 280px); image-rendering: pixelated; object-fit: contain; border-radius: 10px;"/>
 
   <div id="status-message"></div>
 
@@ -422,14 +436,24 @@
       }
     });
 
-    document.getElementById('yourName').textContent = yourID;
-    document.getElementById('lover-id-box').textContent = loverID;
-
-    const avatarImg = document.getElementById('lover-avatar');
-    avatarImg.src = `images/avatars/${loverID}.png`;
-    avatarImg.onerror = () => {
-      avatarImg.src = 'images/avatars/default.png';
+    // Set your name and lover's name in the new name boxes
+    document.getElementById('yourNameBox').textContent = yourID;
+    document.getElementById('loverNameBox').textContent = loverID;
+    
+    // Set your avatar image with fallback
+    const yourAvatarImg = document.getElementById('your-avatar');
+    yourAvatarImg.src = `images/avatars/${yourID}.png`;
+    yourAvatarImg.onerror = () => {
+      yourAvatarImg.src = 'images/avatars/default.png';
     };
+    
+    // Set lover avatar image with fallback
+    const loverAvatarImg = document.getElementById('lover-avatar');
+    loverAvatarImg.src = `images/avatars/${loverID}.png`;
+    loverAvatarImg.onerror = () => {
+      loverAvatarImg.src = 'images/avatars/default.png';
+    };
+
 
     function updateBackgroundColor(id) {
       if (id.toLowerCase() === 'serenitym16') {
@@ -570,6 +594,22 @@
     window.onload = () => {
       chatInput.focus();
     };
+
+    const loadingBar = document.getElementById('loading-bar');
+
+    function animateLoadingBar() {
+      let width = 0;
+      function frame() {
+        width += 1;
+        if (width > 100) width = 0;
+        loadingBar.style.width = width + '%';
+        requestAnimationFrame(frame);
+      }
+      frame();
+    }
+    
+    animateLoadingBar();
+    
   </script>
 </body>
 </html>
