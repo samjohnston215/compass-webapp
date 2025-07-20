@@ -209,10 +209,233 @@
   </div>
   <div id="chat-wrapper">
     <button id="clear-chat-btn" title="Clear Chat" aria-label="Clear Chat">🗑️</button>
-    <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" maxlength="200" />
+    <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" />
   </div>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
   <script>
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
+      authDomain: "compassapp-cb4ed.firebaseapp.com",
+      databaseURL: "https://compassapp-cb4ed-default-rtdb.firebaseio.com",
+      projectId: "compassapp-cb4ed",
+      storageBucket: "compassapp-cb4ed.appspot.com",
+      messagingSenderId: "820890755353",
+      appId: "1:820890755353:web:d4e33e791f925166506588"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const db = firebase.database();
+    const auth = firebase.auth();
+
+    const yourID = localStorage.getItem('yourID');
+    const loverID = localStorage.getItem('loverID');
+
+    const emailMap = {
+      "Serenitym16": "serenitym16@example.com",
+      "athloi": "athloi@example.com"
+    };
+    const passwordMap = {
+      "Serenitym16": "password123",
+      "athloi": "password123"
+    };
+
+    // DOM elements
+    const chatInput = document.getElementById('chat-input');
+    const chatMessages = document.getElementById('chat-messages');
+    const statusBottomLeft = document.getElementById('status-bottom-left');
+    const statusMsg = document.getElementById('status-message');
+    const compassImg = document.getElementById('compass-img');
+    const clearChatBtn = document.getElementById('clear-chat-btn');
+    const yourNameBox = document.getElementById('yourNameBox');
+    const loverNameBox = document.getElementById('loverNameBox');
+    const yourAvatarImg = document.getElementById('your-avatar');
+    const loverAvatarImg = document.getElementById('lover-avatar');
+
+    // Sanitize function for chat messages
+    function sanitize(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && chatInput.value.trim() !== '') {
+        const message = {
+          sender: yourID,
+          text: chatInput.value.trim(),
+          timestamp: Date.now()
+        };
+        db.ref('messages').push(message);
+        chatInput.value = '';
+        chatInput.focus();
+      }
+    });
+
+    clearChatBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear the chat? This cannot be undone.')) {
+        db.ref('messages').remove();
+        chatMessages.innerHTML = '';
+      }
+    });
+
+    // Set your name and lover's name in the name boxes
+    yourNameBox.textContent = yourID;
+    loverNameBox.textContent = loverID;
+    document.getElementById('yourName').textContent = yourID;
+
+    // Set avatar images with fallback
+    yourAvatarImg.src = `images/avatars/${yourID}.png`;
+    yourAvatarImg.onerror = () => {
+      yourAvatarImg.src = 'images/avatars/default.png';
+    };
+    loverAvatarImg.src = `images/avatars/${loverID}.png`;
+    loverAvatarImg.onerror = () => {
+      loverAvatarImg.src = 'images/avatars/default.png';
+    };
+
+    // Background color based on yourID
+    function updateBackgroundColor(id) {
+      if (id.toLowerCase() === 'serenitym16') {
+        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
+      } else if (id.toLowerCase() === 'athloi') {
+        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--athloi-lavender');
+      } else {
+        document.body.style.backgroundColor = '#1d1d1d';
+      }
+    }
+    updateBackgroundColor(yourID);
+
+    // Compass and distance logic
+    function toRad(d) {
+      return d * Math.PI / 180;
+    }
+    function getBearing(lat1, lon1, lat2, lon2) {
+      const dLon = toRad(lon2 - lon1);
+      const y = Math.sin(dLon) * Math.cos(toRad(lat2));
+      const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
+                Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
+      const brg = Math.atan2(y, x) * 180 / Math.PI;
+      return (brg + 360) % 360;
+    }
+    function getDistanceMiles(lat1, lon1, lat2, lon2) {
+      const R = 3958.8; // Earth radius in miles
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+    function getCardinalDirection(bearing) {
+      const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+      const idx = Math.round(bearing / 45) % 8;
+      return directions[idx];
+    }
+
+    const totalFrames = 29;
+
+    let yourPos = {}, loverPos = null;
+    let lastLoverUpdate = 0;
+
+    function showNeedle(angle) {
+      if (angle == null || loverPos === null) {
+        compassImg.style.display = 'none';
+        return;
+      }
+      compassImg.style.display = 'block';
+      const frameIdx = Math.floor((angle / 360) * totalFrames) % totalFrames;
+      const padded = frameIdx.toString().padStart(2, '0');
+      const imgURL = `images/needle-frames/frame_${padded}_delay-0.06s.png`;
+      compassImg.src = imgURL;
+    }
+
+    function updateCompass() {
+      if (yourPos.lat && loverPos && loverPos.lat) {
+        const brg = getBearing(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon);
+        const dist = getDistanceMiles(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon).toFixed(1);
+        const dir = getCardinalDirection(brg);
+        showNeedle(brg);
+        const targetName = yourID.toLowerCase() === 'athloi' ? 'Serenitym16' : 'athloi';
+        statusMsg.textContent = `You are ${dist} miles ${dir} of ${targetName}`;
+      } else {
+        showNeedle(null);
+        statusMsg.textContent = '';
+      }
+    }
+
+    function startTracking() {
+      navigator.geolocation.watchPosition(pos => {
+        yourPos = {
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude
+        };
+        db.ref('users/' + yourID).set(yourPos);
+      }, () => alert('Location permission denied'), {
+        enableHighAccuracy: true
+      });
+
+      db.ref('users/' + loverID).on('value', snapshot => {
+        const data = snapshot.val();
+        if (data && data.lat != null && data.lon != null) {
+          loverPos = { lat: data.lat, lon: data.lon };
+          updateCompass();
+          statusMsg.textContent = '';
+          lastLoverUpdate = Date.now();
+          // Set loading dots color (optional, here just toggling class 'on')
+          // We won't change colors here because loading dots animation runs independently.
+        } else {
+          loverPos = null;
+          updateCompass();
+          statusMsg.textContent = `Waiting for ${loverID}'s location...`;
+        }
+      });
+
+      setInterval(() => {
+        if (!lastLoverUpdate || (Date.now() - lastLoverUpdate > 30000)) {
+          statusMsg.textContent = `${loverID}'s location is unavailable or outdated.`;
+          loverPos = null;
+          updateCompass();
+        }
+      }, 5000);
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        startTracking();
+      } else {
+        const email = emailMap[yourID];
+        const password = passwordMap[yourID];
+
+        if (!email || !password) {
+          alert("Login config not found. Check index.html setup.");
+          return;
+        }
+
+        auth.signInWithEmailAndPassword(email, password)
+          .then(() => startTracking())
+          .catch(err => alert("Auth failed: " + err.message));
+      }
+    });
+
+    // Listen for new chat messages and add to chat-messages container
+    db.ref('messages').limitToLast(50).on('child_added', (snapshot) => {
+      const msg = snapshot.val();
+      const safeText = sanitize(msg.text);
+      const line = `<div><span style="color:gold">${sanitize(msg.sender)}</span>: ${safeText}</div>`;
+      chatMessages.insertAdjacentHTML('beforeend', line);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+
+    if (!yourID || !loverID) {
+      alert("Missing ID info. Returning to start.");
+      window.location.href = 'index.html';
+    }
+
     // Animate loading dots
     const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
     let dotIndex = 0;
@@ -222,6 +445,11 @@
       });
       dotIndex = (dotIndex + 1) % dots.length;
     }, 500);
+
+    // Autofocus input on load
+    window.onload = () => {
+      chatInput.focus();
+    };
   </script>
 </body>
 </html>
