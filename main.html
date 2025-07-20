@@ -1,3 +1,4 @@
+<!-- main.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +16,8 @@
       --text-light: #fff;
       --text-highlight: yellow;
       --font-family: 'Press Start 2P', monospace;
+      --dark-gray: #222222;
+      --white-border: #ffffff;
     }
     body {
       font-family: var(--font-family);
@@ -34,9 +37,6 @@
       padding: 1rem;
       border-radius: 10px;
       margin-bottom: 1rem;
-      max-width: 600px;
-      width: 90vw;
-      box-sizing: border-box;
     }
     #logs-container {
       position: fixed;
@@ -47,12 +47,13 @@
       max-width: 600px;
       max-height: 35vh;
       overflow-y: auto;
-      background: var(--bg-lighter);
+      background: var(--dark-gray);
+      border: 2px solid var(--white-border);
       border-radius: 8px;
       padding: 12px;
       font-size: 13px;
       line-height: 1.4;
-      box-sizing: border-box;
+      color: var(--text-light);
     }
     #chat-wrapper {
       position: fixed;
@@ -61,161 +62,115 @@
       transform: translateX(-50%);
       width: 90vw;
       max-width: 600px;
-      background: #3a5a1a; /* Minecraft grass/dirt inspired greenish */
-      padding: 8px 12px;
-      border-radius: 0;
-      box-sizing: border-box;
+      background: var(--dark-gray);
+      padding: 1rem;
+      border-radius: 10px 10px 0 0;
       display: flex;
       align-items: center;
       gap: 8px;
-      filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.8));
-      image-rendering: pixelated;
-      font-family: var(--font-family);
-      background-image:
-        linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0,0,0,0.15) 1px, transparent 1px);
-      z-index: 10;
+      box-sizing: border-box;
+      border: 2px solid var(--white-border);
     }
+    /* Remove rounded corners everywhere */
     input, textarea, button {
       border-radius: 0 !important;
     }
-    #chat-input {
-      flex-grow: 1;
-      padding: 10px 14px;
-      font-family: var(--font-family);
-      background: transparent;
-      color: var(--text-light);
-      border: 2px solid #5a7d21;
-      font-size: 16px;
-      outline-offset: 2px;
-      user-select: text;
-      caret-color: gold;
-      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11;
-      box-sizing: border-box;
-    }
+    /* Clear chat button with trash icon */
     #clear-chat-btn {
-      background: #4e6f18;
-      border: 2px solid #7eba37;
+      background: transparent;
+      border: 2px solid var(--white-border);
       cursor: pointer;
       padding: 6px;
       color: var(--text-light);
       filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.7));
       font-size: 18px;
       user-select: none;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition: color 0.3s ease;
       flex-shrink: 0;
       line-height: 1;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11;
-      box-sizing: border-box;
     }
     #clear-chat-btn:hover {
-      background: #7eba37;
-      color: #1a2600;
+      color: #ff5555;
+      border-color: #ff5555;
     }
-
+    #chat-input {
+      flex-grow: 1;
+      padding: 10px;
+      font-family: var(--font-family);
+      background: transparent;
+      color: var(--text-light);
+      border: 2px solid var(--white-border);
+      font-size: 16px;
+      outline-offset: 2px;
+      user-select: text;
+      box-sizing: border-box;
+    }
+    #status-message {
+      margin-top: 1rem;
+      font-size: 14px;
+      color: var(--text-highlight);
+    }
+    #loading-dots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .loading-dot {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--white-border);
+      background-color: transparent;
+      box-sizing: border-box;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 0 2px black);
+      transition: background-color 0.3s;
+    }
+    .loading-dot.filled {
+      background-color: var(--text-highlight);
+    }
     .avatars-row {
       display: flex;
       justify-content: space-between;
       width: 90vw;
       max-width: 600px;
-      margin-bottom: 0.5rem;
-      box-sizing: border-box;
-      flex-wrap: nowrap;
+      margin-bottom: 8px;
     }
     .avatar-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      flex: 0 1 auto;
+      width: 120px;
       min-width: 120px;
-      padding: 0 6px;
-      user-select: none;
-    }
-    .name-box {
-      font-size: 14px;
-      white-space: normal; /* allow wrapping */
+      white-space: nowrap;
       overflow: visible;
-      text-overflow: unset;
-      color: var(--text-light);
-      text-align: center;
-      margin-bottom: 4px;
-      word-break: break-word;
     }
-    img.avatar {
-      width: 90px;
-      height: 90px;
-      border-radius: 10px;
-      image-rendering: pixelated;
-      object-fit: contain;
-    }
-
-    #distance-display {
+    .avatar-name {
+      margin-bottom: 0.5rem;
       font-size: 14px;
-      margin: 0.8rem 0;
-      color: var(--text-highlight);
-      font-weight: bold;
-      user-select: none;
-      min-height: 20px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      color: var(--text-light);
     }
-
     #compass-img {
+      margin-top: 1rem;
       width: min(50vmin, 280px);
       height: min(50vmin, 280px);
       image-rendering: pixelated;
       object-fit: contain;
       border-radius: 10px;
-      margin: 0 auto 2rem auto;
-      display: block;
+      filter: drop-shadow(0 0 5px black);
     }
-
-    #loading-dots {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 1rem;
-      user-select: none;
-    }
-    .loading-dot {
-      width: 18px;
-      height: 18px;
-      background: #7eba37;
-      border: 2px solid #415e11;
-      box-shadow: inset 2px 2px 0 #a3d12f, inset -2px -2px 0 #2b3c08;
-      border-radius: 0;
-      image-rendering: pixelated;
-      animation-fill-mode: forwards;
-      opacity: 0.3;
-    }
-    .loading-dot.fill1 {
-      animation: fillDot 1.2s infinite;
-      animation-delay: 0s;
-    }
-    .loading-dot.fill2 {
-      animation: fillDot 1.2s infinite;
-      animation-delay: 0.4s;
-    }
-    .loading-dot.fill3 {
-      animation: fillDot 1.2s infinite;
-      animation-delay: 0.8s;
-    }
-    @keyframes fillDot {
-      0%, 100% { opacity: 0.3; background-color: #7eba37; }
-      50% { opacity: 1; background-color: #a3d12f; }
-    }
-    @media (max-width: 350px) {
-      .avatars-row {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 16px;
-      }
-      .avatar-container {
-        min-width: 100px;
-      }
+    #distance-display {
+      font-size: 14px;
+      margin: 0.5rem 0;
+      color: var(--text-highlight);
+      font-weight: bold;
     }
   </style>
 </head>
@@ -223,32 +178,28 @@
   <div class="info-panel">
     <div><strong>User:</strong> <span id="yourName"></span></div>
   </div>
-
-  <div class="avatars-row" aria-label="User avatars and names">
-    <div class="avatar-container" id="your-avatar-container">
-      <div class="name-box" id="yourNameBox"></div>
-      <img id="your-avatar" class="avatar" src="" alt="Your Avatar"/>
+  <div class="avatars-row">
+    <div class="avatar-container" style="align-items: flex-start;">
+      <div id="yourNameBox" class="avatar-name"></div>
+      <img id="your-avatar" src="" alt="Your Avatar" style="width: 90px; height: 90px; border-radius: 10px; image-rendering: pixelated;"/>
     </div>
-    <div id="loading-dots" aria-label="Loading dots indicating status">
-      <div class="loading-dot fill1"></div>
-      <div class="loading-dot fill2"></div>
-      <div class="loading-dot fill3"></div>
-    </div>
-    <div class="avatar-container" id="lover-avatar-container">
-      <div class="name-box" id="loverNameBox"></div>
-      <img id="lover-avatar" class="avatar" src="" alt="Lover Avatar"/>
+    <div class="avatar-container" style="align-items: flex-end;">
+      <div id="loverNameBox" class="avatar-name"></div>
+      <img id="lover-avatar" src="" alt="Lover Avatar" style="width: 90px; height: 90px; border-radius: 10px; image-rendering: pixelated;"/>
     </div>
   </div>
-
+  <div id="loading-dots" aria-label="Loading indicator" role="status">
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+  </div>
   <div id="distance-display" aria-live="polite" aria-atomic="true"></div>
+  <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Frame" />
 
-  <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Needle" />
-
-  <div id="logs-container" aria-live="polite" aria-atomic="false">
+  <div id="logs-container">
     <div id="status-bottom-left"></div>
     <div id="chat-messages"></div>
   </div>
-
   <div id="chat-wrapper">
     <button id="clear-chat-btn" title="Clear Chat" aria-label="Clear Chat">🗑️</button>
     <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" />
@@ -287,17 +238,16 @@
       "athloi": "password123"
     };
 
+    // DOM elements
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
     const statusBottomLeft = document.getElementById('status-bottom-left');
     const distanceDisplay = document.getElementById('distance-display');
     const compassImg = document.getElementById('compass-img');
     const clearChatBtn = document.getElementById('clear-chat-btn');
-    const yourNameBox = document.getElementById('yourNameBox');
-    const loverNameBox = document.getElementById('loverNameBox');
-    const yourAvatarImg = document.getElementById('your-avatar');
-    const loverAvatarImg = document.getElementById('lover-avatar');
+    const loadingDots = document.querySelectorAll('.loading-dot');
 
+    // Sanitize function for chat messages
     function sanitize(text) {
       const div = document.createElement('div');
       div.textContent = text;
@@ -324,19 +274,24 @@
       }
     });
 
-    yourNameBox.textContent = yourID;
-    loverNameBox.textContent = loverID;
+    // Set your name and lover's name in the name boxes
+    document.getElementById('yourNameBox').textContent = yourID;
+    document.getElementById('loverNameBox').textContent = loverID;
     document.getElementById('yourName').textContent = yourID;
 
+    // Set avatar images with fallback
+    const yourAvatarImg = document.getElementById('your-avatar');
     yourAvatarImg.src = `images/avatars/${yourID}.png`;
     yourAvatarImg.onerror = () => {
       yourAvatarImg.src = 'images/avatars/default.png';
     };
+    const loverAvatarImg = document.getElementById('lover-avatar');
     loverAvatarImg.src = `images/avatars/${loverID}.png`;
     loverAvatarImg.onerror = () => {
       loverAvatarImg.src = 'images/avatars/default.png';
     };
 
+    // Background color based on yourID
     function updateBackgroundColor(id) {
       if (id.toLowerCase() === 'serenitym16') {
         document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
@@ -348,6 +303,7 @@
     }
     updateBackgroundColor(yourID);
 
+    // Compass and distance logic
     function toRad(d) {
       return d * Math.PI / 180;
     }
@@ -360,10 +316,11 @@
       return (brg + 360) % 360;
     }
     function getDistanceMiles(lat1, lon1, lat2, lon2) {
-      const R = 3958.8;
+      const R = 3958.8; // Earth radius in miles
       const dLat = toRad(lat2 - lat1);
       const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+      const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
@@ -469,6 +426,21 @@
       alert("Missing ID info. Returning to start.");
       window.location.href = 'index.html';
     }
+
+    // Animate loading dots for the three-dot loading indicator
+    let dotIndex = 0;
+    function animateLoadingDots() {
+      loadingDots.forEach((dot, i) => {
+        if (i === dotIndex) {
+          dot.classList.add('filled');
+        } else {
+          dot.classList.remove('filled');
+        }
+      });
+      dotIndex = (dotIndex + 1) % loadingDots.length;
+      setTimeout(animateLoadingDots, 500);
+    }
+    animateLoadingDots();
 
     window.onload = () => {
       chatInput.focus();
