@@ -94,18 +94,18 @@
     #chat-wrapper {
       position: fixed;
       bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90vw;
-      max-width: 600px;
-      background: #222;             /* Dark gray solid */
-      border: 1.5px solid white;   /* White border */
-      padding: 6px 10px;           /* Slightly smaller padding */
+      left: 20px;          /* Align left side with some margin */
+      transform: none;     /* Remove centering */
+      width: auto;         /* auto width to fit content */
+      max-width: 90vw;
+      background: transparent;  /* Remove background */
+      border: none;             /* Remove border */
+      padding: 0;
       box-sizing: border-box;
       display: flex;
       align-items: center;
       gap: 8px;
-      filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.8));
+      filter: none;             /* Remove drop shadow */
       font-family: var(--font-family);
       image-rendering: pixelated;
       z-index: 10;
@@ -114,45 +114,49 @@
     /* Input box with white border and Minecraft style */
     #chat-input {
       flex-grow: 1;
-      padding: 6px 10px;           /* Reduced padding to make box smaller */
+      padding: 6px 10px;
       font-family: var(--font-family);
-      background: transparent;
+      background: #222;  /* solid dark gray background */
       color: var(--text-light);
       border: 1.5px solid white;
-      font-size: 14px;             /* Slightly smaller font size */
+      font-size: 14px;
       outline-offset: 2px;
       user-select: text;
       caret-color: gold;
-      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11;
       box-sizing: border-box;
-      height: 28px;                /* Fixed smaller height */
+      height: 32px;   /* match trash button height */
       line-height: 1.2;
+      border-radius: 0; /* squared corners */
+    }
+    
+    #chat-input::placeholder {
+      color: #ccc;   /* lighter gray placeholder */
+      opacity: 1;    /* full opacity */
     }
 
     /* Clear chat button with white border and Minecraft style */
     #clear-chat-btn {
-      background: #222;            /* Dark gray background to match chat-wrapper */
-      border: 1.5px solid white;  /* White border like input */
+      background: rgba(20, 20, 20, 0.9); /* very dark gray, mostly opaque */
+      border: 1.5px solid white;
+      box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.4); /* light gray inset shadow top-left */
       cursor: pointer;
-      padding: 4px 8px;           /* Slightly smaller padding */
+      padding: 6px 8px;
       color: var(--text-light);
-      filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.7));
       font-size: 18px;
       user-select: none;
-      transition: color 0.3s ease;
       flex-shrink: 0;
       line-height: 1;
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
       box-sizing: border-box;
-      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11; /* Minecraft pixel shading */
+      border-radius: 0; /* squared corners */
     }
-    
     #clear-chat-btn:hover {
       color: #ff5555;
+      box-shadow: inset 2px 2px 3px rgba(255, 85, 85, 0.6);
     }
 
     /* Avatars and names row */
