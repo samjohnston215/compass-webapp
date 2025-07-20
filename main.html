@@ -68,12 +68,18 @@
       border: 2px solid #888;
       border-radius: 4px;
     }
+    #status-message {
+      margin-top: 1rem;
+      font-size: 14px;
+      color: var(--text-highlight);
+    }
   </style>
 </head>
 <body>
   <div class="info-panel">
     <div><strong>User:</strong> <span id="yourName"></span></div>
   </div>
+
   <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; margin-bottom: 1rem;">
     <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 90vw; max-width: 600px;">
       <div style="text-align: center; flex: 1;">
@@ -90,76 +96,44 @@
         <img id="lover-avatar" src="" alt="Lover Avatar" style="width: 90px; height: 90px; border-radius: 10px; image-rendering: pixelated;"/>
       </div>
     </div>
+
+    <div id="status-message"></div>
+
     <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Frame" style="margin-top: 1rem; width: min(50vmin, 280px); height: min(50vmin, 280px); image-rendering: pixelated; object-fit: contain; border-radius: 10px;" />
   </div>
-  <div id="status-message"></div>
+
   <div id="logs-container">
     <div id="status-bottom-left"></div>
     <div id="chat-messages"></div>
   </div>
+
   <div id="chat-wrapper">
     <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" />
   </div>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
-      authDomain: "compassapp-cb4ed.firebaseapp.com",
-      databaseURL: "https://compassapp-cb4ed-default-rtdb.firebaseio.com",
-      projectId: "compassapp-cb4ed",
-      storageBucket: "compassapp-cb4ed.appspot.com",
-      messagingSenderId: "820890755353",
-      appId: "1:820890755353:web:d4e33e791f925166506588"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const auth = firebase.auth();
     const yourID = localStorage.getItem('yourID');
     const loverID = localStorage.getItem('loverID');
-    const emailMap = {
-      "Serenitym16": "serenitym16@example.com",
-      "athloi": "athloi@example.com"
-    };
-    const passwordMap = {
-      "Serenitym16": "password123",
-      "athloi": "password123"
-    };
-    document.getElementById('yourName').textContent = yourID || 'Unknown';
+
+    document.getElementById('yourName').textContent = yourID;
     document.getElementById('yourNameBox').textContent = yourID;
     document.getElementById('loverNameBox').textContent = loverID;
+
     const yourAvatarImg = document.getElementById('your-avatar');
     const loverAvatarImg = document.getElementById('lover-avatar');
+
     yourAvatarImg.src = `images/avatars/${yourID}.png`;
     yourAvatarImg.onerror = () => { yourAvatarImg.src = 'images/avatars/default.png'; };
+
     loverAvatarImg.src = `images/avatars/${loverID}.png`;
     loverAvatarImg.onerror = () => { loverAvatarImg.src = 'images/avatars/default.png'; };
+
     const statusMsg = document.getElementById('status-message');
-    const statusBottomLeft = document.getElementById('status-bottom-left');
-    const chatMessages = document.getElementById('chat-messages');
-    const chatInput = document.getElementById('chat-input');
-    function sanitize(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-    chatInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && chatInput.value.trim() !== '') {
-        const message = {
-          sender: yourID,
-          text: chatInput.value.trim(),
-          timestamp: Date.now()
-        };
-        db.ref('messages').push(message);
-        chatInput.value = '';
-      }
-    });
+    const compassImg = document.getElementById('compass-img');
     const totalFrames = 29;
-    let yourPos = {}, loverPos = null, lastLoverUpdate = 0;
-    function toRad(d) {
-      return d * Math.PI / 180;
-    }
+    let yourPos = {}, loverPos = null;
+
+    function toRad(deg) { return deg * Math.PI / 180; }
     function getBearing(lat1, lon1, lat2, lon2) {
       const dLon = toRad(lon2 - lon1);
       const y = Math.sin(dLon) * Math.cos(toRad(lat2));
@@ -171,15 +145,13 @@
       const R = 3958.8;
       const dLat = toRad(lat2 - lat1);
       const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
+      const a = Math.sin(dLat/2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
     function getCardinalDirection(bearing) {
       const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
       return directions[Math.round(bearing / 45) % 8];
     }
-    const compassImg = document.getElementById('compass-img');
     function showNeedle(angle) {
       if (angle == null || loverPos === null) {
         compassImg.style.display = 'none';
@@ -195,78 +167,40 @@
         const brg = getBearing(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon);
         const dist = getDistanceMiles(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon).toFixed(1);
         const dir = getCardinalDirection(brg);
+        const targetName = yourID === 'athloi' ? 'Serenitym16' : 'athloi';
         showNeedle(brg);
-        statusBottomLeft.textContent = `${loverID} is ${dist} miles ${dir} of ${yourID}`;
+        statusMsg.textContent = `You are ${dist} miles ${dir} of ${targetName}`;
       } else {
         showNeedle(null);
-        statusBottomLeft.textContent = '';
+        statusMsg.textContent = '';
       }
     }
-    function startTracking() {
-      navigator.geolocation.watchPosition(pos => {
-        yourPos = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-        db.ref('users/' + yourID).set(yourPos);
-      }, () => alert('Location permission denied'), { enableHighAccuracy: true });
-      db.ref('users/' + loverID).on('value', snapshot => {
-        const data = snapshot.val();
-        if (data && data.lat != null && data.lon != null) {
-          loverPos = { lat: data.lat, lon: data.lon };
-          updateCompass();
-          statusMsg.textContent = '';
-          lastLoverUpdate = Date.now();
-        } else {
-          loverPos = null;
-          updateCompass();
-          statusMsg.textContent = `Waiting for ${loverID}'s location...`;
-        }
-      });
-      setInterval(() => {
-        if (!lastLoverUpdate || Date.now() - lastLoverUpdate > 30000) {
-          statusMsg.textContent = `${loverID}'s location is unavailable or outdated.`;
-          loverPos = null;
-          updateCompass();
-        }
-      }, 5000);
-    }
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        startTracking();
-      } else {
-        const email = emailMap[yourID];
-        const password = passwordMap[yourID];
-        if (!email || !password) {
-          alert("Login config not found. Check index.html setup.");
-          return;
-        }
-        auth.signInWithEmailAndPassword(email, password)
-          .then(() => startTracking())
-          .catch(err => alert("Auth failed: " + err.message));
-      }
+
+    // Simulate position updates (replace with Firebase + geolocation in production)
+    navigator.geolocation.watchPosition(pos => {
+      yourPos = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+      // Firebase set: db.ref('users/' + yourID).set(yourPos);
     });
-    db.ref('messages').limitToLast(50).on('child_added', (snapshot) => {
-      const msg = snapshot.val();
-      const safeText = sanitize(msg.text);
-      const line = `<div><span style="color:gold">${sanitize(msg.sender)}</span>: ${safeText}</div>`;
-      chatMessages.insertAdjacentHTML('beforeend', line);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    });
+    // Firebase listener (example)
+    // db.ref('users/' + loverID).on('value', snapshot => {
+    //   const data = snapshot.val();
+    //   if (data && data.lat && data.lon) {
+    //     loverPos = { lat: data.lat, lon: data.lon };
+    //     updateCompass();
+    //   }
+    // });
+
+    // Animate loading bar
     const loadingBar = document.getElementById('loading-bar');
-    function animateLoadingBar() {
+    (function animateLoading() {
       let width = 0;
       function frame() {
-        width += 1;
-        if (width > 100) width = 0;
+        width = (width + 1) % 101;
         loadingBar.style.width = width + '%';
         requestAnimationFrame(frame);
       }
       frame();
-    }
-    animateLoadingBar();
-    if (!yourID || !loverID) {
-      alert("Missing ID info. Returning to start.");
-      window.location.href = 'index.html';
-    }
-    window.onload = () => chatInput.focus();
+    })();
   </script>
 </body>
 </html>
