@@ -1,12 +1,10 @@
-<!-- main.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Prevent zoom on mobile when typing -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Love Compass</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
     :root {
       --serenity-green: #89a32e;
@@ -16,8 +14,6 @@
       --text-light: #fff;
       --text-highlight: yellow;
       --font-family: 'Press Start 2P', monospace;
-      --dot-on-color: #d4af37; /* gold-ish, Minecraft-style */
-      --dot-off-color: #3b3b3b; /* dark gray block */
     }
     body {
       font-family: var(--font-family);
@@ -38,6 +34,81 @@
       border-radius: 10px;
       margin-bottom: 1rem;
     }
+    #main-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto 1rem auto;
+    }
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    .avatar-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100px;
+    }
+    .middle-loading {
+      display: flex;
+      justify-content: center;
+      flex-grow: 1;
+    }
+    .name-box {
+      margin-bottom: 0.5rem;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 10px;
+      image-rendering: pixelated;
+    }
+    #loading-dots {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      align-items: center;
+      height: 16px;
+    }
+    .loading-dot {
+      width: 12px;
+      height: 12px;
+      background: #333;
+      border: 2px solid #888;
+      box-shadow: inset 1px 1px 0 #000, inset -1px -1px 0 #444;
+      image-rendering: pixelated;
+    }
+    .loading-dot.on {
+      background: gold;
+    }
+    #compass-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+    #compass-img {
+      margin-top: 1rem;
+      width: min(50vmin, 280px);
+      height: min(50vmin, 280px);
+      image-rendering: pixelated;
+      object-fit: contain;
+      border-radius: 10px;
+      transition: filter 0.3s ease;
+    }
+    #status-message {
+      margin-top: 1rem;
+      font-size: 14px;
+      color: var(--text-highlight);
+    }
     #logs-container {
       position: fixed;
       bottom: 70px;
@@ -51,7 +122,7 @@
       border-radius: 8px;
       padding: 12px;
       font-size: 13px;
-      line-height: 1.4; /* Slightly increased line spacing */
+      line-height: 1.4;
     }
     #chat-wrapper {
       position: fixed;
@@ -68,11 +139,9 @@
       gap: 8px;
       box-sizing: border-box;
     }
-    /* Remove rounded corners everywhere */
     input, textarea, button {
       border-radius: 0 !important;
     }
-    /* Clear chat button with trash icon */
     #clear-chat-btn {
       background: transparent;
       border: none;
@@ -98,100 +167,12 @@
       flex-grow: 1;
       padding: 10px;
       font-family: var(--font-family);
-      background: transparent; /* Transparent background */
+      background: transparent;
       color: var(--text-light);
       border: 2px solid #888;
-      font-size: 16px; /* Prevent zoom on mobile */
+      font-size: 16px;
       outline-offset: 2px;
       user-select: text;
-    }
-    #status-message {
-      margin-top: 1rem;
-      font-size: 14px;
-      color: var(--text-highlight);
-    }
-
-    #compass-img {
-      margin-top: 1rem;
-      width: min(50vmin, 280px);
-      height: min(50vmin, 280px);
-      image-rendering: pixelated;
-      object-fit: contain;
-      border-radius: 10px;
-      transition: filter 0.3s ease;
-    }
-
-    /* Layout classes to replace inline styles */
-    .flex-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      width: 90vw;
-      max-width: 600px;
-    }
-    .flex-center {
-      display: flex;
-      justify-content: center;
-      flex: 1;
-    }
-    .flex-column-center {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 600px;
-      margin-bottom: 1rem;
-    }
-    .name-box {
-      margin-bottom: 0.5rem;
-      font-size: 14px;
-      white-space: nowrap;
-      text-align: center;
-    }
-    img.avatar {
-      width: 90px;
-      height: 90px;
-      border-radius: 10px;
-      image-rendering: pixelated;
-    }
-
-    /* Chat message timestamp styling */
-    .chat-timestamp {
-      font-size: 10px;
-      color: #bbb;
-      margin-left: 8px;
-      user-select: none;
-    }
-
-    /* Minecraft-style dots container */
-    #loading-dots {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      align-items: center;
-      margin: 0 1rem;
-      width: 100px;
-      height: 16px;
-    }
-
-    /* Each dot as a pixelated square */
-    .loading-dot {
-      width: 16px;
-      height: 16px;
-      background-color: var(--dot-off-color);
-      border: 2px solid #222;
-      box-shadow:
-        inset 2px 2px 0 #555,
-        inset -2px -2px 0 #111;
-      image-rendering: pixelated;
-      border-radius: 2px;
-      transition: background-color 0.3s ease;
-    }
-    .loading-dot.on {
-      background-color: var(--dot-on-color);
-      box-shadow:
-        inset 2px 2px 0 #f8de7e,
-        inset -2px -2px 0 #a07e00;
     }
   </style>
 </head>
@@ -199,28 +180,30 @@
   <div class="info-panel" role="region" aria-label="User information">
     <div><strong>User:</strong> <span id="yourName"></span></div>
   </div>
-  <div class="flex-column-center">
-    <div class="flex-row" role="region" aria-label="User and lover info">
-      <div style="flex:1; text-align:center;">
+  <div id="main-wrapper">
+    <div class="top-row">
+      <div class="avatar-side">
         <div id="yourNameBox" class="name-box"></div>
         <img id="your-avatar" class="avatar" src="" alt="Your Avatar" />
       </div>
-
-      <div id="loading-dots" aria-hidden="true" title="Loading...">
-        <div class="loading-dot" id="dot1"></div>
-        <div class="loading-dot" id="dot2"></div>
-        <div class="loading-dot" id="dot3"></div>
+      <div class="middle-loading">
+        <div id="loading-dots" aria-hidden="true" title="Loading...">
+          <div class="loading-dot" id="dot1"></div>
+          <div class="loading-dot" id="dot2"></div>
+          <div class="loading-dot" id="dot3"></div>
+        </div>
       </div>
-
-      <div style="flex:1; text-align:center;">
+      <div class="avatar-side">
         <div id="loverNameBox" class="name-box"></div>
         <img id="lover-avatar" class="avatar" src="" alt="Lover Avatar" />
       </div>
     </div>
     <div id="status-message" role="status" aria-live="polite"></div>
-    <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Needle" />
+    <div id="compass-wrapper">
+      <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Needle" />
+    </div>
   </div>
-  <div id="logs-container" role="log" aria-live="polite" aria-relevant="additions" aria-atomic="false">
+  <div id="logs-container">
     <div id="status-bottom-left"></div>
     <div id="chat-messages"></div>
   </div>
@@ -229,306 +212,16 @@
     <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" maxlength="200" />
   </div>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-
   <script>
-    // Initialize Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyCcAduuqgdNmrhQtQHmtnL0kQwXZPu9b2A",
-      authDomain: "compassapp-cb4ed.firebaseapp.com",
-      databaseURL: "https://compassapp-cb4ed-default-rtdb.firebaseio.com",
-      projectId: "compassapp-cb4ed",
-      storageBucket: "compassapp-cb4ed.appspot.com",
-      messagingSenderId: "820890755353",
-      appId: "1:820890755353:web:d4e33e791f925166506588"
-    };
-    firebase.initializeApp(firebaseConfig);
-
-    const db = firebase.database();
-    const auth = firebase.auth();
-
-    const yourID = localStorage.getItem('yourID');
-    const loverID = localStorage.getItem('loverID');
-
-    const emailMap = {
-      "Serenitym16": "serenitym16@example.com",
-      "athloi": "athloi@example.com"
-    };
-    const passwordMap = {
-      "Serenitym16": "password123",
-      "athloi": "password123"
-    };
-
-    // DOM elements
-    const chatInput = document.getElementById('chat-input');
-    const chatMessages = document.getElementById('chat-messages');
-    const statusBottomLeft = document.getElementById('status-bottom-left');
-    const statusMsg = document.getElementById('status-message');
-    const compassImg = document.getElementById('compass-img');
-    const clearChatBtn = document.getElementById('clear-chat-btn');
-    const loadingDots = [
-      document.getElementById('dot1'),
-      document.getElementById('dot2'),
-      document.getElementById('dot3')
-    ];
-
-    // Sanitize function for chat messages
-    function sanitize(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    // Format timestamp to HH:MM 24h format
-    function formatTimestamp(ts) {
-      const date = new Date(ts);
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-      return `${hours}:${minutes}`;
-    }
-
-    // Handle sending chat message
-    chatInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && chatInput.value.trim() !== '') {
-        const message = {
-          sender: yourID,
-          text: chatInput.value.trim(),
-          timestamp: Date.now()
-        };
-        db.ref('messages').push(message);
-        chatInput.value = '';
-        chatInput.focus();
-      }
-    });
-
-    clearChatBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to clear the chat? This cannot be undone.')) {
-        db.ref('messages').remove();
-        chatMessages.innerHTML = '';
-      }
-    });
-
-    // Set your name and lover's name in the name boxes
-    document.getElementById('yourNameBox').textContent = yourID;
-    document.getElementById('loverNameBox').textContent = loverID;
-    document.getElementById('yourName').textContent = yourID;
-
-    // Set avatar images with fallback
-    const yourAvatarImg = document.getElementById('your-avatar');
-    yourAvatarImg.src = `images/avatars/${yourID}.png`;
-    yourAvatarImg.onerror = () => {
-      yourAvatarImg.src = 'images/avatars/default.png';
-    };
-    const loverAvatarImg = document.getElementById('lover-avatar');
-    loverAvatarImg.src = `images/avatars/${loverID}.png`;
-    loverAvatarImg.onerror = () => {
-      loverAvatarImg.src = 'images/avatars/default.png';
-    };
-
-    // Background color based on yourID
-    function updateBackgroundColor(id) {
-      if (id.toLowerCase() === 'serenitym16') {
-        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--serenity-green');
-      } else if (id.toLowerCase() === 'athloi') {
-        document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--athloi-lavender');
-      } else {
-        document.body.style.backgroundColor = '#1d1d1d';
-      }
-    }
-    updateBackgroundColor(yourID);
-
-    // Compass and distance logic
-    function toRad(d) {
-      return d * Math.PI / 180;
-    }
-    function getBearing(lat1, lon1, lat2, lon2) {
-      const dLon = toRad(lon2 - lon1);
-      const y = Math.sin(dLon) * Math.cos(toRad(lat2));
-      const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
-                Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
-      const brg = Math.atan2(y, x) * 180 / Math.PI;
-      return (brg + 360) % 360;
-    }
-    function getDistanceMiles(lat1, lon1, lat2, lon2) {
-      const R = 3958.8; // Earth radius in miles
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat/2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
-    }
-    function getCardinalDirection(bearing) {
-      const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-      const idx = Math.round(bearing / 45) % 8;
-      return directions[idx];
-    }
-
-    const totalFrames = 29;
-
-    let yourPos = {}, loverPos = null;
-    let lastLoverUpdate = 0;
-
-    function showNeedle(angle) {
-      if (angle == null || loverPos === null) {
-        compassImg.style.display = 'none';
-        return;
-      }
-      compassImg.style.display = 'block';
-      const frameIdx = Math.floor((angle / 360) * totalFrames) % totalFrames;
-      const padded = frameIdx.toString().padStart(2, '0');
-      const imgURL = `images/needle-frames/frame_${padded}_delay-0.06s.png`;
-      // Adding fade effect for smoother transition
-      compassImg.style.filter = 'blur(2px)';
-      setTimeout(() => {
-        compassImg.src = imgURL;
-        compassImg.style.filter = 'blur(0)';
-      }, 100);
-    }
-
-    function updateCompass() {
-      if (yourPos.lat && loverPos && loverPos.lat) {
-        const brg = getBearing(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon);
-        const dist = getDistanceMiles(yourPos.lat, yourPos.lon, loverPos.lat, loverPos.lon).toFixed(1);
-        const dir = getCardinalDirection(brg);
-        showNeedle(brg);
-        const targetName = yourID.toLowerCase() === 'athloi' ? 'Serenitym16' : 'athloi';
-        statusMsg.textContent = `You are ${dist} miles ${dir} of ${targetName}`;
-      } else {
-        showNeedle(null);
-        statusMsg.textContent = '';
-      }
-    }
-
-    // Debounce function for location update (limit updates to once every 2 seconds)
-    function debounce(func, wait) {
-      let timeout;
-      return function(...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), wait);
-      };
-    }
-
-    let debouncedSetYourPos = debounce(pos => {
-      db.ref('users/' + yourID).set(pos);
-    }, 2000);
-
-    function startTracking() {
-      navigator.geolocation.watchPosition(pos => {
-        yourPos = {
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude
-        };
-        debouncedSetYourPos(yourPos);
-      }, () => alert('Location permission denied'), {
-        enableHighAccuracy: true
-      });
-
-      db.ref('users/' + loverID).on('value', snapshot => {
-        const data = snapshot.val();
-        if (data && data.lat != null && data.lon != null) {
-          loverPos = { lat: data.lat, lon: data.lon };
-          updateCompass();
-          statusMsg.textContent = '';
-          lastLoverUpdate = Date.now();
-          setLoadingDotsActive(true);
-        } else {
-          loverPos = null;
-          updateCompass();
-          statusMsg.textContent = `Waiting for ${loverID}'s location...`;
-          setLoadingDotsActive(false);
-        }
-      });
-
-      setInterval(() => {
-        if (!lastLoverUpdate || (Date.now() - lastLoverUpdate > 30000)) {
-          statusMsg.textContent = `${loverID}'s location is unavailable or outdated.`;
-          loverPos = null;
-          updateCompass();
-          setLoadingDotsActive(false);
-        } else {
-          setLoadingDotsActive(true);
-        }
-      }, 5000);
-    }
-
     // Animate loading dots
-    let currentDot = 0;
-    let dotsInterval;
-
-    function animateLoadingDots() {
-      dotsInterval = setInterval(() => {
-        loadingDots.forEach((dot, idx) => {
-          if (idx === currentDot) {
-            dot.classList.add('on');
-          } else {
-            dot.classList.remove('on');
-          }
-        });
-        currentDot = (currentDot + 1) % loadingDots.length;
-      }, 500);
-    }
-
-    function setLoadingDotsActive(active) {
-      if (active) {
-        if (!dotsInterval) {
-          animateLoadingDots();
-        }
-      } else {
-        clearInterval(dotsInterval);
-        dotsInterval = null;
-        loadingDots.forEach(dot => dot.classList.remove('on'));
-      }
-    }
-
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        startTracking();
-      } else {
-        const email = emailMap[yourID];
-        const password = passwordMap[yourID];
-
-        if (!email || !password) {
-          alert("Login config not found. Check index.html setup.");
-          return;
-        }
-
-        auth.signInWithEmailAndPassword(email, password)
-          .then(() => startTracking())
-          .catch(err => alert("Auth failed: " + err.message));
-      }
-    });
-
-    // Listen for new chat messages and add to chat-messages container
-    db.ref('messages').limitToLast(50).on('child_added', (snapshot) => {
-      const msg = snapshot.val();
-      const safeText = sanitize(msg.text);
-      const time = msg.timestamp ? formatTimestamp(msg.timestamp) : '';
-      const line = `
-        <div>
-          <span style="color:gold">${sanitize(msg.sender)}</span>: ${safeText}
-          <span class="chat-timestamp">${time}</span>
-        </div>`;
-      chatMessages.insertAdjacentHTML('beforeend', line);
-
-      // Scroll only if near bottom to avoid disrupting user reading old messages
-      const threshold = 50; // px
-      if (chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < threshold) {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-    });
-
-    if (!yourID || !loverID) {
-      alert("Missing ID info. Returning to start.");
-      window.location.href = 'index.html';
-    }
-
-    // Autofocus input on load
-    window.onload = () => {
-      chatInput.focus();
-    };
+    const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
+    let dotIndex = 0;
+    setInterval(() => {
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('on', idx === dotIndex);
+      });
+      dotIndex = (dotIndex + 1) % dots.length;
+    }, 500);
   </script>
 </body>
 </html>
