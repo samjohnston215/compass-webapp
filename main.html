@@ -63,24 +63,21 @@
 
     #status-bottom-left {
       position: fixed;
-      bottom: 30px; /* slightly higher from bottom */
+      bottom: 20px; /* slightly higher */
       left: 0;
-      width: 66.66vw; /* 2/3 of the viewport */
-      max-width: 600px;
       font-family: 'Press Start 2P', monospace;
       font-size: 12px;
       color: white;
-      background: rgba(200, 200, 200, 0.9); /* light gray background */
-      padding: 10px 12px;
-      border-top-right-radius: 8px;
-      border-bottom-right-radius: 8px;
+      background: rgba(40, 40, 40, 0.8); /* darker gray, slightly transparent */
+      padding: 6px 12px;
+      border: none;
+      border-radius: 0; /* no rounded corners */
       user-select: none;
       z-index: 9999;
+      max-width: 66vw;
       text-align: left;
-      line-height: 1.4;
       word-wrap: break-word;
-      overflow-wrap: break-word;
-      box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+      white-space: normal;
     }
 
     @media (max-width: 500px) {
