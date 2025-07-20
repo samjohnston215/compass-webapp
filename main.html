@@ -97,28 +97,28 @@
 
     /* Clear chat button with white border and Minecraft style */
     #clear-chat-btn {
-      background: #4e6f18;
-      border: 1.5px solid white;    /* white border */
+      background: #222;            /* Dark gray background to match chat-wrapper */
+      border: 1.5px solid white;  /* White border like input */
       cursor: pointer;
-      padding: 6px;
+      padding: 4px 8px;           /* Slightly smaller padding */
       color: var(--text-light);
       filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.7));
       font-size: 18px;
       user-select: none;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition: color 0.3s ease;
       flex-shrink: 0;
       line-height: 1;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11;
       box-sizing: border-box;
+      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11; /* Minecraft pixel shading */
     }
+    
     #clear-chat-btn:hover {
-      background: #7eba37;
-      color: #1a2600;
+      color: #ff5555;
     }
 
     /* Avatars and names row */
