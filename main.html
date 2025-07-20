@@ -95,7 +95,6 @@
       position: fixed;
       bottom: 20px;
       left: 20px;          /* Align left side with some margin */
-      right: 10px;
       transform: none;     /* Remove centering */
       width: auto;         /* auto width to fit content */
       max-width: 90vw;
@@ -116,6 +115,7 @@
     #chat-input {
       flex-grow: 1;
       padding: 10px;
+      right: 10px;
       font-family: var(--font-family);
       background: rgba(20, 20, 20, 0.9); /* same very dark gray background */
       color: var(--text-light);
@@ -126,7 +126,7 @@
       height: 32px;
       box-sizing: border-box;
       border-radius: 0;
-      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11; /* match trash icon effect */
+      box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.4); /* light gray shadow top-left */
     }
     
     #chat-input::placeholder {
