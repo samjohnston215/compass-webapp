@@ -10,87 +10,104 @@
     :root {
       --serenity-green: #89a32e;
       --athloi-lavender: #B57EDC;
+      --bg-dark: rgba(20, 20, 20, 0.8);
+      --bg-lighter: rgba(40, 40, 40, 0.7);
+      --text-light: #fff;
+      --text-highlight: yellow;
+      --font-family: 'Press Start 2P', monospace;
+    }
+
+    /* Reset and base styles */
+    * {
+      box-sizing: border-box;
     }
 
     body {
-      font-family: 'Press Start 2P', monospace;
-      margin: 0;            /* Remove default margin */
-      padding: 0.5rem 1rem 1rem 1rem; /* minimal top padding to not stick to browser edge */
-      text-align: center;
-      color: white;
-      min-height: 100vh;
+      font-family: var(--font-family);
+      margin: 0;
+      padding: 1rem;
+      color: var(--text-light);
       background-color: var(--serenity-green);
       transition: background-color 0.5s ease;
-    
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start; /* Align items starting from top */
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
     }
-    
+
+    /* Info panel at top */
     .info-panel {
       max-width: 400px;
-      margin: 0 auto 1rem auto; /* top margin removed, only bottom margin */
+      width: 90vw;
+      margin: 0 auto 1rem auto;
       padding: 1rem;
       background: rgba(0,0,0,0.6);
-      border: 3px solid white;
       border-radius: 10px;
       line-height: 1.5;
+      text-align: center;
+      user-select: none;
     }
-    
+
+    /* User and lover ID container */
     #lover-id-box-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-top: 0.5rem;
-    }
-    
-    #lover-id-box {
       max-width: 400px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 16px;
-      color: white;
-      background: rgba(128,128,128,0.6);
-      padding: 6px 10px;
+      width: 90vw;
       user-select: none;
-      box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
-      margin-bottom: 0.5rem;
     }
-    
-    /* Remove borders and background from compass and avatar */
+
+    #lover-id-box {
+      font-family: var(--font-family);
+      font-size: 16px;
+      color: var(--text-light);
+      background: rgba(128,128,128,0.6);
+      padding: 8px 12px;
+      margin-bottom: 0.5rem;
+      border-radius: 6px;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+      text-align: center;
+      user-select: none;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* Compass and avatar styles - same size */
     #compass-img,
     #lover-avatar {
       width: min(40vmin, 250px);
       height: min(40vmin, 250px);
       image-rendering: pixelated;
       object-fit: contain;
-    
-      /* Removed border, border-radius, background, box-shadow */
-      border: none !important;
-      border-radius: 0 !important;
-      background: transparent !important;
-      box-shadow: none !important;
-    
-      margin: 1rem auto 1rem auto;
+      filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.7));
+      margin: 1rem auto;
       display: block;
+      border-radius: 10px;
+      background: transparent;
+      border: none; /* Removed borders */
+      user-select: none;
     }
-    
+
     #compass-img {
       display: none;
     }
-    
-    #lover-avatar {
-      filter: drop-shadow(2px 2px 1px rgba(0,0,0,0.6));
-    }
 
+    /* Status message (yellow text) */
     #status-message {
-      color: yellow;
-      font-family: 'Press Start 2P', monospace;
+      color: var(--text-highlight);
+      font-family: var(--font-family);
       margin-top: 1rem;
       min-height: 1.4em;
+      text-align: center;
+      user-select: none;
     }
 
-    /* Container for both logs */
+    /* Logs container: status + chat messages */
     #logs-container {
       position: fixed;
       bottom: 70px; /* leave room for chat input */
@@ -101,31 +118,29 @@
       flex-direction: column;
       gap: 6px;
       padding: 6px 12px;
-      user-select: none;
-      font-family: 'Press Start 2P', monospace;
+      font-family: var(--font-family);
       font-size: 12px;
-      color: white;
+      color: var(--text-light);
       z-index: 9999;
       pointer-events: auto;
       overflow-y: auto;
-      background: rgba(40, 40, 40, 0.7);
+      background: var(--bg-lighter);
       border-radius: 8px;
+      user-select: none;
     }
 
-    /* Distance/status area */
+    /* Status bottom-left area */
     #status-bottom-left {
       background: transparent;
-      border-radius: 0;
       padding: 6px 8px;
-      overflow-y: auto;
-      flex-grow: 0;
-      max-height: 3.5em; /* single line plus a bit */
+      max-height: 3.5em; /* single line */
       white-space: nowrap;
+      overflow: hidden;
       text-overflow: ellipsis;
-      overflow-x: hidden;
+      user-select: none;
     }
 
-    /* Chat message area */
+    /* Chat messages */
     #chat-messages {
       background: transparent;
       padding: 6px 8px;
@@ -137,8 +152,10 @@
       word-wrap: break-word;
       white-space: normal;
       box-shadow: none;
+      user-select: text;
     }
 
+    /* Chat input wrapper */
     #chat-wrapper {
       position: fixed;
       bottom: 0;
@@ -146,44 +163,163 @@
       width: 44.4%; /* 4/9ths */
       text-align: center;
       padding: 0.5rem;
-      background: rgba(20, 20, 20, 0.6); /* slightly transparent */
+      background: rgba(20, 20, 20, 0.6);
       box-shadow: 0 -3px 5px rgba(0,0,0,0.7);
       z-index: 10000;
       border-top-right-radius: 10px;
       border-bottom-right-radius: 10px;
+      user-select: none;
     }
 
     #chat-input {
-      font-family: 'Press Start 2P', monospace;
+      font-family: var(--font-family);
       font-size: 12px;
-      width: 100%; /* full width of container */
-      padding: 6px;
+      width: 100%;
+      padding: 8px 10px;
       background: rgba(30,30,30,0.7);
-      color: white;
+      color: var(--text-light);
       border: 2px solid #888;
       border-radius: 4px;
       outline-offset: 2px;
+      user-select: text;
     }
 
     #chat-input::placeholder {
       color: #ccc;
     }
 
-    @media (max-width: 500px) {
+    /* Scrollbar styling for chat messages and logs container for modern browsers */
+    #chat-messages::-webkit-scrollbar,
+    #logs-container::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    #chat-messages::-webkit-scrollbar-thumb,
+    #logs-container::-webkit-scrollbar-thumb {
+      background: rgba(200, 200, 200, 0.3);
+      border-radius: 4px;
+    }
+    #chat-messages::-webkit-scrollbar-track,
+    #logs-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* Responsive Mobile Enhancements */
+    @media (max-width: 900px) {
+      /* Slightly smaller avatar/compass */
+      #compass-img,
+      #lover-avatar {
+        width: min(30vmin, 180px);
+        height: min(30vmin, 180px);
+      }
+
+      /* Logs container gets wider */
+      #logs-container {
+        max-width: 80vw;
+        max-height: 35vh;
+        bottom: 100px; /* give some breathing room */
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 10px;
+        font-size: 14px;
+      }
+
+      /* Chat input wrapper full width on smaller screens */
+      #chat-wrapper {
+        width: 90vw;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 10px 10px 0 0;
+        bottom: 0;
+        padding: 0.75rem 1rem;
+      }
+
+      #chat-input {
+        font-size: 14px;
+        padding: 10px 14px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      /* Stack elements vertically */
+      body {
+        padding: 0.5rem;
+        min-height: 100vh;
+        align-items: stretch;
+      }
+
+      /* Info panel full width */
+      .info-panel {
+        width: 100%;
+        max-width: none;
+        padding: 1rem 0.75rem;
+      }
+
+      /* Lover ID box full width */
+      #lover-id-box-wrapper {
+        width: 100%;
+        max-width: none;
+        margin-top: 0.3rem;
+        padding: 0 0.75rem;
+      }
+
       #lover-id-box {
         font-size: 14px;
-        max-width: 90vw;
+        padding: 10px 12px;
       }
+
+      /* Smaller avatar & compass */
+      #compass-img,
+      #lover-avatar {
+        width: min(25vmin, 140px);
+        height: min(25vmin, 140px);
+        margin: 0.5rem auto;
+      }
+
+      /* Status message smaller font */
+      #status-message {
+        font-size: 12px;
+        margin-top: 0.8rem;
+      }
+
+      /* Logs container full width near bottom */
       #logs-container {
-        max-width: 90vw;
-      }
-      #chat-wrapper {
-        width: 90%;
+        position: fixed;
+        bottom: 120px;
+        left: 0;
+        right: 0;
+        max-width: 100vw;
+        max-height: 30vh;
+        margin: 0 auto;
         border-radius: 0;
-        left: 5%;
+        padding: 8px 12px;
+        font-size: 13px;
       }
+
+      /* Chat input full width, larger touch target */
+      #chat-wrapper {
+        width: 100vw;
+        left: 0;
+        transform: none;
+        border-radius: 0;
+        padding: 1rem 1rem 1.5rem;
+        box-shadow: 0 -4px 10px rgba(0,0,0,0.8);
+      }
+
       #chat-input {
-        width: 100%;
+        font-size: 16px;
+        padding: 14px 16px;
+        border-radius: 6px;
+      }
+    }
+
+    @media (max-height: 500px) {
+      /* Shorter screens: reduce logs max height */
+      #logs-container {
+        max-height: 20vh;
+      }
+      #chat-messages {
+        max-height: 15vh;
       }
     }
   </style>
