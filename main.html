@@ -94,6 +94,8 @@
       text-align: left;
       word-wrap: break-word;
       white-space: normal;
+      overflow-y: auto;
+      max-height: 30vh;
     }
 
     @media (max-width: 500px) {
@@ -118,6 +120,10 @@
 
   <div id="status-message"></div>
   <div id="status-bottom-left"></div>
+
+  <div id="chat-wrapper" style="position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; padding: 0.5rem;">
+    <input id="chat-input" type="text" placeholder="Type a message..." style="font-family: 'Press Start 2P'; font-size: 12px; width: 80%; padding: 6px; background: rgba(30,30,30,0.9); color: white; border: 2px solid #888;" />
+  </div>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -150,6 +156,19 @@
       "Serenitym16": "password123",
       "athloi": "password123"
     };
+
+    const chatInput = document.getElementById('chat-input');
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && chatInput.value.trim() !== '') {
+        const message = {
+          sender: yourID,
+          text: chatInput.value.trim(),
+          timestamp: Date.now()
+        };
+        db.ref('messages').push(message);
+        chatInput.value = '';
+      }
+    });
 
     document.getElementById('yourName').textContent = yourID;
     document.getElementById('lover-id-box').textContent = loverID;
@@ -282,6 +301,13 @@
           .then(() => startTracking())
           .catch(err => alert("Auth failed: " + err.message));
       }
+    });
+
+    db.ref('messages').limitToLast(10).on('child_added', (snapshot) => {
+      const msg = snapshot.val();
+      const line = `<div><span style="color:gold">${msg.sender}</span>: ${msg.text}</div>`;
+      statusBottomLeft.innerHTML += line;
+      statusBottomLeft.scrollTop = statusBottomLeft.scrollHeight;
     });
 
     if (!yourID || !loverID) {
