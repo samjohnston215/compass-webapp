@@ -1,9 +1,7 @@
-<!-- main.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Prevent zoom on mobile when typing -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Love Compass</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
@@ -16,8 +14,6 @@
       --text-light: #fff;
       --text-highlight: yellow;
       --font-family: 'Press Start 2P', monospace;
-      --dark-gray: #222222;
-      --white-border: #ffffff;
     }
     body {
       font-family: var(--font-family);
@@ -37,7 +33,12 @@
       padding: 1rem;
       border-radius: 10px;
       margin-bottom: 1rem;
+      max-width: 600px;
+      width: 90vw;
+      box-sizing: border-box;
     }
+
+    /* Chat messages container with solid dark gray bg and white border */
     #logs-container {
       position: fixed;
       bottom: 70px;
@@ -47,14 +48,15 @@
       max-width: 600px;
       max-height: 35vh;
       overflow-y: auto;
-      background: var(--dark-gray);
-      border: 2px solid var(--white-border);
+      background: #222;              /* solid dark gray */
+      border: 1.5px solid white;    /* white border */
       border-radius: 8px;
       padding: 12px;
       font-size: 13px;
       line-height: 1.4;
-      color: var(--text-light);
+      box-sizing: border-box;
     }
+
     #chat-wrapper {
       position: fixed;
       bottom: 0;
@@ -62,115 +64,175 @@
       transform: translateX(-50%);
       width: 90vw;
       max-width: 600px;
-      background: var(--dark-gray);
-      padding: 1rem;
-      border-radius: 10px 10px 0 0;
+      background: #3a5a1a;
+      padding: 8px 12px;
+      border-radius: 0;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-sizing: border-box;
-      border: 2px solid var(--white-border);
+      filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.8));
+      image-rendering: pixelated;
+      font-family: var(--font-family);
+      background-image:
+        linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.15) 1px, transparent 1px);
+      z-index: 10;
     }
-    /* Remove rounded corners everywhere */
     input, textarea, button {
       border-radius: 0 !important;
     }
-    /* Clear chat button with trash icon */
-    #clear-chat-btn {
+
+    /* Input box with white border and Minecraft style */
+    #chat-input {
+      flex-grow: 1;
+      padding: 10px 14px;
+      font-family: var(--font-family);
       background: transparent;
-      border: 2px solid var(--white-border);
+      color: var(--text-light);
+      border: 1.5px solid white;    /* white border */
+      font-size: 16px;
+      outline-offset: 2px;
+      user-select: text;
+      caret-color: gold;
+      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11;
+      box-sizing: border-box;
+    }
+
+    /* Clear chat button with white border and Minecraft style */
+    #clear-chat-btn {
+      background: #4e6f18;
+      border: 1.5px solid white;    /* white border */
       cursor: pointer;
       padding: 6px;
       color: var(--text-light);
       filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.7));
       font-size: 18px;
       user-select: none;
-      transition: color 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
       flex-shrink: 0;
       line-height: 1;
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: inset 2px 2px 0 #7eba37, inset -2px -2px 0 #415e11;
+      box-sizing: border-box;
     }
     #clear-chat-btn:hover {
-      color: #ff5555;
-      border-color: #ff5555;
+      background: #7eba37;
+      color: #1a2600;
     }
-    #chat-input {
-      flex-grow: 1;
-      padding: 10px;
-      font-family: var(--font-family);
-      background: transparent;
-      color: var(--text-light);
-      border: 2px solid var(--white-border);
-      font-size: 16px;
-      outline-offset: 2px;
-      user-select: text;
-      box-sizing: border-box;
-    }
-    #status-message {
-      margin-top: 1rem;
-      font-size: 14px;
-      color: var(--text-highlight);
-    }
-    #loading-dots {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .loading-dot {
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--white-border);
-      background-color: transparent;
-      box-sizing: border-box;
-      image-rendering: pixelated;
-      filter: drop-shadow(0 0 2px black);
-      transition: background-color 0.3s;
-    }
-    .loading-dot.filled {
-      background-color: var(--text-highlight);
-    }
+
+    /* Avatars and names row */
     .avatars-row {
       display: flex;
       justify-content: space-between;
       width: 90vw;
       max-width: 600px;
-      margin-bottom: 8px;
+      margin-bottom: 0.5rem;
+      box-sizing: border-box;
+      flex-wrap: nowrap;
+      user-select: none;
     }
     .avatar-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 120px;
+      flex: 0 1 auto;
       min-width: 120px;
-      white-space: nowrap;
-      overflow: visible;
+      padding: 0 6px;
     }
-    .avatar-name {
-      margin-bottom: 0.5rem;
+    .name-box {
       font-size: 14px;
-      overflow-wrap: break-word;
-      word-break: break-word;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
       color: var(--text-light);
+      text-align: center;
+      margin-bottom: 4px;
+      word-break: break-word;
     }
+    img.avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 10px;
+      image-rendering: pixelated;
+      object-fit: contain;
+    }
+
+    /* Distance and direction text */
+    #distance-display {
+      font-size: 14px;
+      margin: 0.8rem 0;
+      color: var(--text-highlight);
+      font-weight: bold;
+      user-select: none;
+      min-height: 20px;
+      max-width: 600px;
+      width: 90vw;
+      box-sizing: border-box;
+    }
+
+    /* Compass needle */
     #compass-img {
-      margin-top: 1rem;
       width: min(50vmin, 280px);
       height: min(50vmin, 280px);
       image-rendering: pixelated;
       object-fit: contain;
       border-radius: 10px;
-      filter: drop-shadow(0 0 5px black);
+      margin: 0 auto 2rem auto;
+      display: block;
     }
-    #distance-display {
-      font-size: 14px;
-      margin: 0.5rem 0;
-      color: var(--text-highlight);
-      font-weight: bold;
+
+    /* Minecraft-style loading dots */
+    #loading-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 1rem;
+      user-select: none;
+      min-width: 84px; /* 3 dots * (18px + 8px gap minus last gap) */
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .loading-dot {
+      width: 18px;
+      height: 18px;
+      background: #7eba37;
+      border: 2px solid #415e11;
+      box-shadow: inset 2px 2px 0 #a3d12f, inset -2px -2px 0 #2b3c08;
+      border-radius: 0;
+      image-rendering: pixelated;
+      animation-fill-mode: forwards;
+      opacity: 0.3;
+    }
+    .loading-dot.fill1 {
+      animation: fillDot 1.2s infinite;
+      animation-delay: 0s;
+    }
+    .loading-dot.fill2 {
+      animation: fillDot 1.2s infinite;
+      animation-delay: 0.4s;
+    }
+    .loading-dot.fill3 {
+      animation: fillDot 1.2s infinite;
+      animation-delay: 0.8s;
+    }
+    @keyframes fillDot {
+      0%, 100% { opacity: 0.3; background-color: #7eba37; }
+      50% { opacity: 1; background-color: #a3d12f; }
+    }
+    @media (max-width: 350px) {
+      .avatars-row {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+      }
+      .avatar-container {
+        min-width: 100px;
+      }
     }
   </style>
 </head>
@@ -178,28 +240,32 @@
   <div class="info-panel">
     <div><strong>User:</strong> <span id="yourName"></span></div>
   </div>
-  <div class="avatars-row">
-    <div class="avatar-container" style="align-items: flex-start;">
-      <div id="yourNameBox" class="avatar-name"></div>
-      <img id="your-avatar" src="" alt="Your Avatar" style="width: 90px; height: 90px; border-radius: 10px; image-rendering: pixelated;"/>
-    </div>
-    <div class="avatar-container" style="align-items: flex-end;">
-      <div id="loverNameBox" class="avatar-name"></div>
-      <img id="lover-avatar" src="" alt="Lover Avatar" style="width: 90px; height: 90px; border-radius: 10px; image-rendering: pixelated;"/>
-    </div>
-  </div>
-  <div id="loading-dots" aria-label="Loading indicator" role="status">
-    <div class="loading-dot"></div>
-    <div class="loading-dot"></div>
-    <div class="loading-dot"></div>
-  </div>
-  <div id="distance-display" aria-live="polite" aria-atomic="true"></div>
-  <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Frame" />
 
-  <div id="logs-container">
+  <div class="avatars-row" aria-label="User avatars and names">
+    <div class="avatar-container" id="your-avatar-container">
+      <div class="name-box" id="yourNameBox"></div>
+      <img id="your-avatar" class="avatar" src="" alt="Your Avatar"/>
+    </div>
+    <div id="loading-dots" aria-label="Loading dots indicating status">
+      <div class="loading-dot fill1"></div>
+      <div class="loading-dot fill2"></div>
+      <div class="loading-dot fill3"></div>
+    </div>
+    <div class="avatar-container" id="lover-avatar-container">
+      <div class="name-box" id="loverNameBox"></div>
+      <img id="lover-avatar" class="avatar" src="" alt="Lover Avatar"/>
+    </div>
+  </div>
+
+  <div id="distance-display" aria-live="polite" aria-atomic="true"></div>
+
+  <img id="compass-img" src="images/needle-frames/frame_00_delay-0.06s.png" alt="Compass Needle" />
+
+  <div id="logs-container" aria-live="polite" aria-atomic="false">
     <div id="status-bottom-left"></div>
     <div id="chat-messages"></div>
   </div>
+
   <div id="chat-wrapper">
     <button id="clear-chat-btn" title="Clear Chat" aria-label="Clear Chat">🗑️</button>
     <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" />
@@ -241,11 +307,9 @@
     // DOM elements
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
-    const statusBottomLeft = document.getElementById('status-bottom-left');
     const distanceDisplay = document.getElementById('distance-display');
     const compassImg = document.getElementById('compass-img');
     const clearChatBtn = document.getElementById('clear-chat-btn');
-    const loadingDots = document.querySelectorAll('.loading-dot');
 
     // Sanitize function for chat messages
     function sanitize(text) {
@@ -319,8 +383,7 @@
       const R = 3958.8; // Earth radius in miles
       const dLat = toRad(lat2 - lat1);
       const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat / 2) ** 2 +
-                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
@@ -384,67 +447,32 @@
           distanceDisplay.textContent = `Waiting for ${loverID}'s location...`;
         }
       });
-
-      setInterval(() => {
-        if (!lastLoverUpdate || (Date.now() - lastLoverUpdate > 30000)) {
-          distanceDisplay.textContent = `${loverID}'s location is unavailable or outdated.`;
-          loverPos = null;
-          updateCompass();
-        } else {
-          distanceDisplay.textContent = '';
-        }
-      }, 5000);
     }
 
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        startTracking();
-      } else {
-        const email = emailMap[yourID];
-        const password = passwordMap[yourID];
-        if (email && password) {
-          auth.signInWithEmailAndPassword(email, password).catch(e => {
-            console.error('Auth failed:', e);
-            distanceDisplay.textContent = 'Authentication failed. Please check your credentials.';
-          });
-        } else {
-          distanceDisplay.textContent = 'No authentication credentials found.';
-        }
-      }
-    });
+    startTracking();
 
-    db.ref('messages').on('child_added', snapshot => {
-      const msg = snapshot.val();
-      if (!msg) return;
-      const div = document.createElement('div');
-      div.innerHTML = `<strong style="color: yellow;">${sanitize(msg.sender)}</strong>: ${sanitize(msg.text)}`;
-      chatMessages.appendChild(div);
+    // Chat message listener
+    db.ref('messages').limitToLast(100).on('value', snapshot => {
+      chatMessages.innerHTML = '';
+      snapshot.forEach(childSnapshot => {
+        const msg = childSnapshot.val();
+        if (!msg) return;
+        const msgDiv = document.createElement('div');
+        const senderName = sanitize(msg.sender);
+        const text = sanitize(msg.text);
+        const color = senderName.toLowerCase() === yourID.toLowerCase() ? 'yellow' : 'yellow';
+        msgDiv.innerHTML = `<strong style="color:${color};">${senderName}:</strong> ${text}`;
+        chatMessages.appendChild(msgDiv);
+      });
       chatMessages.scrollTop = chatMessages.scrollHeight;
     });
 
-    if (!yourID || !loverID) {
-      alert("Missing ID info. Returning to start.");
-      window.location.href = 'index.html';
+    // Sanitize helper function (used above)
+    function sanitize(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     }
-
-    // Animate loading dots for the three-dot loading indicator
-    let dotIndex = 0;
-    function animateLoadingDots() {
-      loadingDots.forEach((dot, i) => {
-        if (i === dotIndex) {
-          dot.classList.add('filled');
-        } else {
-          dot.classList.remove('filled');
-        }
-      });
-      dotIndex = (dotIndex + 1) % loadingDots.length;
-      setTimeout(animateLoadingDots, 500);
-    }
-    animateLoadingDots();
-
-    window.onload = () => {
-      chatInput.focus();
-    };
   </script>
 </body>
 </html>
