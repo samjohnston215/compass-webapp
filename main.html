@@ -3,7 +3,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Prevent zoom on mobile when typing -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Love Compass</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
   <style>
@@ -65,6 +66,10 @@
       gap: 8px;
       box-sizing: border-box;
     }
+    /* Remove rounded corners everywhere */
+    input, textarea, button {
+      border-radius: 0 !important;
+    }
     /* Clear chat button with trash icon */
     #clear-chat-btn {
       background: transparent;
@@ -76,6 +81,13 @@
       font-size: 18px;
       user-select: none;
       transition: color 0.3s ease;
+      flex-shrink: 0;
+      line-height: 1;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #clear-chat-btn:hover {
       color: #ff5555;
@@ -84,10 +96,9 @@
       flex-grow: 1;
       padding: 10px;
       font-family: var(--font-family);
-      background: transparent; /* Removed background */
+      background: transparent; /* Transparent background */
       color: var(--text-light);
       border: 2px solid #888;
-      border-radius: 0; /* No rounded corners */
       font-size: 16px; /* Prevent zoom on mobile */
       outline-offset: 2px;
       user-select: text;
@@ -145,12 +156,10 @@
     <div id="chat-messages"></div>
   </div>
   <div id="chat-wrapper">
-    <button id="clear-chat-btn" title="Clear Chat" aria-label="Clear Chat">
-      <!-- Trash can icon from Unicode -->
-      🗑️
-    </button>
+    <button id="clear-chat-btn" title="Clear Chat" aria-label="Clear Chat">🗑️</button>
     <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off" />
   </div>
+
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -214,10 +223,10 @@
     });
 
     clearChatBtn.addEventListener('click', () => {
-      // Remove all messages in DB under 'messages'
-      db.ref('messages').remove();
-      // Clear local chat messages display
-      chatMessages.innerHTML = '';
+      if (confirm('Are you sure you want to clear the chat? This cannot be undone.')) {
+        db.ref('messages').remove();
+        chatMessages.innerHTML = '';
+      }
     });
 
     // Set your name and lover's name in the name boxes
@@ -324,8 +333,7 @@
           updateCompass();
           statusMsg.textContent = '';
           lastLoverUpdate = Date.now();
-          // Remove red X if any
-          loadingBar.style.filter = '';
+          loadingBar.style.backgroundColor = 'white';
         } else {
           loverPos = null;
           updateCompass();
@@ -338,12 +346,8 @@
           statusMsg.textContent = `${loverID}'s location is unavailable or outdated.`;
           loverPos = null;
           updateCompass();
-          // Show red X on loading bar
-          loadingBar.style.filter = 'drop-shadow(0 0 0 red) drop-shadow(0 0 0 red)';
-          loadingBar.style.backgroundColor = '#ff4444';
+          loadingBar.style.backgroundColor = '#ff4444'; // red color on loading bar
         } else {
-          // Remove red X and restore white background if previously set
-          loadingBar.style.filter = '';
           loadingBar.style.backgroundColor = 'white';
         }
       }, 5000);
@@ -381,7 +385,7 @@
       window.location.href = 'index.html';
     }
 
-    // Loading bar animation: fill from left to right then reset
+    // Loading bar animation: fill left to right then reset
     let loadingWidth = 0;
     function animateLoadingBar() {
       loadingWidth += 2; // speed of fill
