@@ -16,6 +16,8 @@
       --text-light: #fff;
       --text-highlight: yellow;
       --font-family: 'Press Start 2P', monospace;
+      --dot-on-color: #d4af37; /* gold-ish, Minecraft-style */
+      --dot-off-color: #3b3b3b; /* dark gray block */
     }
     body {
       font-family: var(--font-family);
@@ -108,24 +110,7 @@
       font-size: 14px;
       color: var(--text-highlight);
     }
-    #loading-bar-container {
-      width: 100px;
-      height: 16px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-      margin-bottom: 20px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #loading-bar {
-      background: white;
-      width: 0%;
-      height: 100%;
-      border-radius: 10px;
-      transition: width 0.1s linear, background-color 0.5s ease;
-    }
+
     #compass-img {
       margin-top: 1rem;
       width: min(50vmin, 280px);
@@ -177,6 +162,37 @@
       margin-left: 8px;
       user-select: none;
     }
+
+    /* Minecraft-style dots container */
+    #loading-dots {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      margin: 0 1rem;
+      width: 100px;
+      height: 16px;
+    }
+
+    /* Each dot as a pixelated square */
+    .loading-dot {
+      width: 16px;
+      height: 16px;
+      background-color: var(--dot-off-color);
+      border: 2px solid #222;
+      box-shadow:
+        inset 2px 2px 0 #555,
+        inset -2px -2px 0 #111;
+      image-rendering: pixelated;
+      border-radius: 2px;
+      transition: background-color 0.3s ease;
+    }
+    .loading-dot.on {
+      background-color: var(--dot-on-color);
+      box-shadow:
+        inset 2px 2px 0 #f8de7e,
+        inset -2px -2px 0 #a07e00;
+    }
   </style>
 </head>
 <body>
@@ -189,11 +205,13 @@
         <div id="yourNameBox" class="name-box"></div>
         <img id="your-avatar" class="avatar" src="" alt="Your Avatar" />
       </div>
-      <div class="flex-center">
-        <div id="loading-bar-container" aria-hidden="true">
-          <div id="loading-bar"></div>
-        </div>
+
+      <div id="loading-dots" aria-hidden="true" title="Loading...">
+        <div class="loading-dot" id="dot1"></div>
+        <div class="loading-dot" id="dot2"></div>
+        <div class="loading-dot" id="dot3"></div>
       </div>
+
       <div style="flex:1; text-align:center;">
         <div id="loverNameBox" class="name-box"></div>
         <img id="lover-avatar" class="avatar" src="" alt="Lover Avatar" />
@@ -250,8 +268,12 @@
     const statusBottomLeft = document.getElementById('status-bottom-left');
     const statusMsg = document.getElementById('status-message');
     const compassImg = document.getElementById('compass-img');
-    const loadingBar = document.getElementById('loading-bar');
     const clearChatBtn = document.getElementById('clear-chat-btn');
+    const loadingDots = [
+      document.getElementById('dot1'),
+      document.getElementById('dot2'),
+      document.getElementById('dot3')
+    ];
 
     // Sanitize function for chat messages
     function sanitize(text) {
@@ -411,11 +433,12 @@
           updateCompass();
           statusMsg.textContent = '';
           lastLoverUpdate = Date.now();
-          loadingBar.style.backgroundColor = 'white';
+          setLoadingDotsActive(true);
         } else {
           loverPos = null;
           updateCompass();
           statusMsg.textContent = `Waiting for ${loverID}'s location...`;
+          setLoadingDotsActive(false);
         }
       });
 
@@ -424,14 +447,43 @@
           statusMsg.textContent = `${loverID}'s location is unavailable or outdated.`;
           loverPos = null;
           updateCompass();
-          loadingBar.style.backgroundColor = '#ff4444'; // red color on loading bar
+          setLoadingDotsActive(false);
         } else {
-          loadingBar.style.backgroundColor = 'white';
+          setLoadingDotsActive(true);
         }
       }, 5000);
     }
 
-    auth.onAuthStateChanged(async (user) => {
+    // Animate loading dots
+    let currentDot = 0;
+    let dotsInterval;
+
+    function animateLoadingDots() {
+      dotsInterval = setInterval(() => {
+        loadingDots.forEach((dot, idx) => {
+          if (idx === currentDot) {
+            dot.classList.add('on');
+          } else {
+            dot.classList.remove('on');
+          }
+        });
+        currentDot = (currentDot + 1) % loadingDots.length;
+      }, 500);
+    }
+
+    function setLoadingDotsActive(active) {
+      if (active) {
+        if (!dotsInterval) {
+          animateLoadingDots();
+        }
+      } else {
+        clearInterval(dotsInterval);
+        dotsInterval = null;
+        loadingDots.forEach(dot => dot.classList.remove('on'));
+      }
+    }
+
+    auth.onAuthStateChanged(user => {
       if (user) {
         startTracking();
       } else {
@@ -443,12 +495,9 @@
           return;
         }
 
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-          startTracking();
-        } catch (err) {
-          alert("Auth failed: " + err.message);
-        }
+        auth.signInWithEmailAndPassword(email, password)
+          .then(() => startTracking())
+          .catch(err => alert("Auth failed: " + err.message));
       }
     });
 
@@ -475,16 +524,6 @@
       alert("Missing ID info. Returning to start.");
       window.location.href = 'index.html';
     }
-
-    // Loading bar animation: fill left to right then reset
-    let loadingWidth = 0;
-    function animateLoadingBar() {
-      loadingWidth += 2; // speed of fill
-      if (loadingWidth > 100) loadingWidth = 0;
-      loadingBar.style.width = loadingWidth + '%';
-      requestAnimationFrame(animateLoadingBar);
-    }
-    animateLoadingBar();
 
     // Autofocus input on load
     window.onload = () => {
